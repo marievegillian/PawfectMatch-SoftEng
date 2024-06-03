@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "258409193215",
+    "project_id": "pawfectmatch-f92dd",
+    "storage_bucket": "pawfectmatch-f92dd.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:258409193215:android:3de89c24c8e67853bab6ca",
+        "android_client_info": {
+          "package_name": "com.example.pawfectmatch"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBoav52T9sKjkzvjAmttLJMAM2TP7oTyF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
