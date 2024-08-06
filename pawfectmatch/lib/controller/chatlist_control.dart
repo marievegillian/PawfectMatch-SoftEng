@@ -308,13 +308,13 @@ Future<List<Map<String, dynamic>>> getConversationsForUser(
     if (messagesSnapshot.docs.isNotEmpty) {
       var data = messagesSnapshot.docs.first.data() as Map<String, dynamic>;
       // Check if "messageContent" exists in the data
-      if (data!.containsKey('messageContent')) {
-        lastMessage = data?['messageContent'];
+      if (data.containsKey('messageContent')) {
+        lastMessage = data['messageContent'];
       }
 
       // Similarly, check for other fields like 'timestamp' and handle them accordingly
 
-      Timestamp timestamp = data?['timestamp'];
+      Timestamp timestamp = data['timestamp'];
       // Convert Timestamp to DateTime
       DateTime dateTime = timestamp.toDate();
       // Format DateTime as desired (in 12-hour clock format with AM/PM)

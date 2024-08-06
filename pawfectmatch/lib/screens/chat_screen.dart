@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pawfectmatch/controller/chat_control.dart';
-import 'package:pawfectmatch/screens/appointment_screen.dart';
+// import 'package:pawfectmatch/screens/appointment_screen.dart';
 
 class ChatScreen extends StatefulWidget {
   final String otherDogName;
@@ -120,37 +120,37 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: ElevatedButton.icon(
-              onPressed: () {
-                // Navigate to the appointment screen
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => AppointmentScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                padding: const EdgeInsets.all(9),
-              ),
-              icon: const Icon(
-                Icons.calendar_today_rounded,
-                color: Color(0xff011F3F),
-              ),
-              label: const Text(
-                'Set Schedule',
-                style: TextStyle(
-                  color: Color(0xff011F3F),
-                ),
-              ),
-            ),
-          ),
-        ],
+        // actions: [
+        //   Padding(
+            // padding: const EdgeInsets.symmetric(horizontal: 12),
+            // child: ElevatedButton.icon(
+            //   onPressed: () {
+            //     // Navigate to the appointment screen
+            //     Navigator.push(
+            //       context,
+            //       MaterialPageRoute(builder: (context) => AppointmentScreen()),
+            //     );
+            //   },
+            //   style: ElevatedButton.styleFrom(
+            //     backgroundColor: Colors.white,
+            //     shape: RoundedRectangleBorder(
+            //       borderRadius: BorderRadius.circular(8),
+            //     ),
+            //     padding: const EdgeInsets.all(9),
+            //   ),
+            //   icon: const Icon(
+            //     Icons.calendar_today_rounded,
+            //     color: Color(0xff011F3F),
+            //   ),
+            //   label: const Text(
+            //     'Set Schedule',
+            //     style: TextStyle(
+            //       color: Color(0xff011F3F),
+            //     ),
+            //   ),
+            // ),
+        //   ),
+        // ],
       ),
       body: Column(
         children: [
