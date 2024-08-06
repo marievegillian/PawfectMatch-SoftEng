@@ -58,15 +58,20 @@ class _PromptBotScreenState extends State<PromptBotScreen> {
                 return Align(
                   alignment:
                       isUserMessage ? Alignment.centerRight : Alignment.centerLeft,
-                  child: Container(
-                    margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: isUserMessage ? Colors.blue[200] : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(10),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.7,
                     ),
-                    child: Text(message["text"]!),
-                  ),
+                    child: Container(
+                      margin: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: isUserMessage ? Colors.blue[200] : Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Text(message["text"]!),
+                    ),
+                  )
                 );
               },
             ),
@@ -80,6 +85,7 @@ class _PromptBotScreenState extends State<PromptBotScreen> {
                     controller: _controller,
                     decoration: InputDecoration(labelText: 'Type a message'),
                     onSubmitted: (value) => _sendMessage(),
+                    maxLines:null,
                   ),
                 ),
                 IconButton(
