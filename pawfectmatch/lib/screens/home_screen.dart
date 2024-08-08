@@ -28,8 +28,8 @@ class _HomeScreenState extends State<HomeScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chats'),
+          BottomNavigationBarItem(icon: Icon(Icons.api_rounded), label: 'PromptBot'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'), // Map icon added
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Schedules'),
           BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: 'Profile'),
         ],
       ),
@@ -43,9 +43,9 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const ChatListScreen(); 
       case 2:
-        return MapScreen(); // Add MapScreen
+          return PromptBotScreen();
       case 3:
-        return AppointmentScreen();
+        return MapScreen(); // Add MapScreen
       case 4:
         return const UserProfileScreen(); 
       default:

@@ -92,7 +92,7 @@
       // Get the dogOwned by awaiting the result of getDogOwned
       String? dog1 = await getDogOwned(dogOwnerId);
 
-      if (dog1 != null && dog1.isNotEmpty) {
+      if (dog1.isNotEmpty) {
         CollectionReference<Map<String, dynamic>> likedDogsCollection =
             _firebaseFirestore.collection('dogs').doc(dog1).collection('likedDogs');
 

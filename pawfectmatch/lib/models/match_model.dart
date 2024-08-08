@@ -1,4 +1,4 @@
-import 'package:pawfectmatch/models/dog_model.dart'; // Import Dog model
+// Import Dog model
 
 class Match {
   final String id;

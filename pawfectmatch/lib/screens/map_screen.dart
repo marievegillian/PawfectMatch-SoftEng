@@ -38,7 +38,7 @@ class _MapScreenState extends State<MapScreen> {
         ),
         myLocationButtonEnabled: true,
         myLocationEnabled: true,
-        markers: {...?userLocation != null ? randomMarkers.toSet() : {}},
+        markers: {...userLocation != null ? randomMarkers.toSet() : {}},
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
