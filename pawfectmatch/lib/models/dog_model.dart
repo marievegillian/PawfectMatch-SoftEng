@@ -1,3 +1,5 @@
+import 'package:intl/intl.dart';
+
 class Dog {
   String bio;
   String birthday;
@@ -57,9 +59,19 @@ class Dog {
     };
   }
 
+  String convertAndFormatDate(String birthday) {
+    DateFormat inputFormat = DateFormat('MMMM dd, yyyy');
+    DateTime birthDate = inputFormat.parse(birthday);
+    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
+    return outputFormat.format(birthDate);
+  }
+  
   int calculateAge() {
-    DateTime now = DateTime.now();
-    DateTime birthDate = DateTime.parse(birthday);
+    String formattedBirthday = convertAndFormatDate(birthday);
+
+    DateTime now = DateTime.now();    
+    // DateTime birthDate = DateTime.parse(birthday);
+    DateTime birthDate = DateTime.parse(formattedBirthday);
     int age = now.year - birthDate.year;
     if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
       age--;

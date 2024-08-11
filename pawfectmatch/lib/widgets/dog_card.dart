@@ -33,7 +33,7 @@ class DogCard extends StatelessWidget{
                       color: Colors.grey.withOpacity(0.5),
                       spreadRadius: 5,
                       blurRadius: 8,
-                      offset: Offset(3, 3),
+                      offset: const Offset(3, 3),
                     ),
                   ],
                 ),
@@ -41,7 +41,7 @@ class DogCard extends StatelessWidget{
               Container(
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(10.0),
-                  gradient: LinearGradient(
+                  gradient: const LinearGradient(
                     colors: [
                       Color.fromARGB(200, 0, 0, 0),
                       Color.fromARGB(0, 0, 0, 0),
@@ -59,7 +59,7 @@ class DogCard extends StatelessWidget{
                   children: [
                     Text(
                       '${dog.name}, ${dog.calculateAge()}',
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 35.0,
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.bold,
@@ -68,7 +68,7 @@ class DogCard extends StatelessWidget{
                     ),
                     Row(
                       children: [
-                        SizedBox(width: 10),
+                        const SizedBox(width: 10),
                         GestureDetector(
                           child: SizedBox(
                             width: 45,

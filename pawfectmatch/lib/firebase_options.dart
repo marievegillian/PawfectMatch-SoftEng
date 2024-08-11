@@ -27,10 +27,7 @@ class DefaultFirebaseOptions {
       case TargetPlatform.macOS:
         return macos;
       case TargetPlatform.windows:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return windows;
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
@@ -44,38 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyD9rqOULy7nIk_TcXeNNZbMimXYwdq1aAY',
-    appId: '1:258409193215:web:5ac584ecacb27b68bab6ca',
-    messagingSenderId: '258409193215',
-    projectId: 'pawfectmatch-f92dd',
-    authDomain: 'pawfectmatch-f92dd.firebaseapp.com',
-    storageBucket: 'pawfectmatch-f92dd.appspot.com',
-    measurementId: 'G-8TZ01KNDP6',
+    apiKey: 'AIzaSyDRWYn8TMWMFM0QxrWi-PnZHScnme_N9fU',
+    appId: '1:247180526908:web:9f6769c43086574e048a39',
+    messagingSenderId: '247180526908',
+    projectId: 'softeng-pawfectmatch',
+    authDomain: 'softeng-pawfectmatch.firebaseapp.com',
+    storageBucket: 'softeng-pawfectmatch.appspot.com',
+    measurementId: 'G-6LMXP7351Q',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBoav52T9sKjkzvjAmttLJMAM2TP7oTyF4',
-    appId: '1:258409193215:android:3de89c24c8e67853bab6ca',
-    messagingSenderId: '258409193215',
-    projectId: 'pawfectmatch-f92dd',
-    storageBucket: 'pawfectmatch-f92dd.appspot.com',
+    apiKey: 'AIzaSyC1j32hlrEpu9TyuKOJuWQ77-DHZObjQe4',
+    appId: '1:247180526908:android:5b82e34a44079345048a39',
+    messagingSenderId: '247180526908',
+    projectId: 'softeng-pawfectmatch',
+    storageBucket: 'softeng-pawfectmatch.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAath__yk2_zoHK3uGcVnVMUS9amNsUJjo',
-    appId: '1:258409193215:ios:3482e56e39ac2277bab6ca',
-    messagingSenderId: '258409193215',
-    projectId: 'pawfectmatch-f92dd',
-    storageBucket: 'pawfectmatch-f92dd.appspot.com',
+    apiKey: 'AIzaSyCrA8CV2Pd3iksOsKxT8yNMoJyQYLzkNEY',
+    appId: '1:247180526908:ios:60d5e6141e29d722048a39',
+    messagingSenderId: '247180526908',
+    projectId: 'softeng-pawfectmatch',
+    storageBucket: 'softeng-pawfectmatch.appspot.com',
     iosBundleId: 'com.example.pawfectmatch',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyAath__yk2_zoHK3uGcVnVMUS9amNsUJjo',
-    appId: '1:258409193215:ios:e1976fb6a465c7efbab6ca',
-    messagingSenderId: '258409193215',
-    projectId: 'pawfectmatch-f92dd',
-    storageBucket: 'pawfectmatch-f92dd.appspot.com',
-    iosBundleId: 'com.example.pawfectmatch.RunnerTests',
+    apiKey: 'AIzaSyCrA8CV2Pd3iksOsKxT8yNMoJyQYLzkNEY',
+    appId: '1:247180526908:ios:60d5e6141e29d722048a39',
+    messagingSenderId: '247180526908',
+    projectId: 'softeng-pawfectmatch',
+    storageBucket: 'softeng-pawfectmatch.appspot.com',
+    iosBundleId: 'com.example.pawfectmatch',
   );
+
+  static const FirebaseOptions windows = FirebaseOptions(
+    apiKey: 'AIzaSyDRWYn8TMWMFM0QxrWi-PnZHScnme_N9fU',
+    appId: '1:247180526908:web:1627cb175e8eab09048a39',
+    messagingSenderId: '247180526908',
+    projectId: 'softeng-pawfectmatch',
+    authDomain: 'softeng-pawfectmatch.firebaseapp.com',
+    storageBucket: 'softeng-pawfectmatch.appspot.com',
+    measurementId: 'G-C4CLKBSXH5',
+  );
+
 }
