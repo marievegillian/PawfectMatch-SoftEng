@@ -32,7 +32,8 @@ class DogsScreen extends StatelessWidget {
         elevation: 0,
       ),
       extendBodyBehindAppBar: true,
-      body: Column(
+      body: SingleChildScrollView(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
@@ -172,7 +173,7 @@ class DogsScreen extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 15,),
-                Text('Bio', 
+                const Text('Bio', 
                 style:TextStyle(
                       fontSize: 20.0,
                       fontFamily: 'Roboto',
@@ -215,8 +216,8 @@ class DogsScreen extends StatelessWidget {
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.normal, 
                       color: Colors.white)
-                    )
-                ),
+                          )
+                      ),
                 SizedBox(height: 10,),
                 Text('Vaccination Status', 
                 style:TextStyle(
@@ -247,10 +248,12 @@ class DogsScreen extends StatelessWidget {
                       color: Colors.white)
                     )
                 ),
-                SizedBox(height: 15,),
+                SizedBox(
+                  height: 15,
+                ),
                 Text('Medical Info', 
                 style:TextStyle(
-                      fontSize: 17.0,
+                      fontSize: 15.0,
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.bold, 
                       color: Colors.black
@@ -264,36 +267,164 @@ class DogsScreen extends StatelessWidget {
                       color: Colors.black
                       ),
                     ),
+                //Block button starts here
+                Center(
+                child: ConstrainedBox(
+                    constraints: const BoxConstraints(
+                        minWidth: 50.0,
+                  ),
+                child: Container(
+                  padding: const EdgeInsets.all(18.0),
+                  margin: const EdgeInsets.only(
+                    top: 25.0,
+                    right: 5.0,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(50.0),
+                    color: Colors.red,
+                  ),
+                  child: InkWell(
+                      onTap: () async {
+                        // Show confirmation dialog
+                        bool? confirm = await showDialog<bool>(
+                          context: context,
+                          barrierDismissible: false, // User must tap a button
+                          builder: (BuildContext context) {
+                            return AlertDialog(                            
+                              title: 
+                              const Center(
+                                child: Text(
+                                  'Confirm Block',
+                                   style: TextStyle(
+                                    fontSize: 25.0,
+                                    fontFamily: 'Roboto',
+                                    fontWeight: FontWeight.w700,                      
+                                    color: Color.fromARGB(255, 7, 34, 62),
+                                  ),
+                                ),
+                              ),
+                              content: const Text('Are you sure you want to block this user?'),
+                              // ),
+                              actions: <Widget>[
+                                // Column to stack buttons vertically
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: <Widget>[
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.red,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(true); // User tapped 'Confirm'
+                                      },
+                                      child: const Center(
+                                        child: Text(
+                                          'Yes, block',
+                                            style: TextStyle(
+                                            fontSize: 18.0,
+                                            fontFamily: 'Roboto',
+                                            fontWeight: FontWeight.bold,                      
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    SizedBox(height: 5.0), // Space between buttons
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.white, // Background color
+                                        // onPrimary: Colors.white, // Text color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                                        ),
+                                      ),
+                                      onPressed: () {
+                                        Navigator.of(context).pop(false); // User tapped 'Cancel'
+                                      },
+                                      child: const Center(
+                                        child: Text(
+                                          'Nevermind, go back',
+                                          style: TextStyle(
+                                          fontSize: 18.0,
+                                          fontFamily: 'Roboto',
+                                          fontWeight: FontWeight.bold,                      
+                                          color: Colors.blue,
+                                        ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
+                          },
+                        );
+
+                        // if (confirm == true) {
+                        //   // Perform the block action
+                        //   String currentUserId = DatabaseRepository().loggedInOwner;
+                        //   String ownerIdToBlock = dog.owner;
+
+                        //   await DatabaseRepository().blockProfile(currentUserId, ownerIdToBlock);
+
+                        //   // Show confirmation message
+                        //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        //     content: Text('Profile blocked successfully'),
+                        //   ));
+
+                        //   // Optionally, navigate back or perform additional actions
+                        //   Navigator.pop(context);
+                        // }
+                    },
+                    child: Center(
+                      child: Text(
+                        'Block this profile',
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontFamily: 'Roboto',
+                          fontWeight: FontWeight.bold,                      
+                          color: Colors.white,
+                        ),                  
+                      ),
+                    ),               
+                    ),                  
+                  ),
+                ),
+                ),
               ]
               ),
             )
         ],
       ),
+    ),
     );
   }
 
-   double calculateDistance(GeoPoint location1, GeoPoint location2) {
-  const double earthRadius = 6371; // Radius of the earth in kilometers
+  double calculateDistance(GeoPoint location1, GeoPoint location2) {
+    const double earthRadius = 6371; // Radius of the earth in kilometers
 
-  // Convert latitude and longitude from degrees to radians
-  double lat1 = location1.latitude * (pi / 180);
-  double lon1 = location1.longitude * (pi / 180);
-  double lat2 = location2.latitude * (pi / 180);
-  double lon2 = location2.longitude * (pi / 180);
+    // Convert latitude and longitude from degrees to radians
+    double lat1 = location1.latitude * (pi / 180);
+    double lon1 = location1.longitude * (pi / 180);
+    double lat2 = location2.latitude * (pi / 180);
+    double lon2 = location2.longitude * (pi / 180);
 
-  // Calculate the change in coordinates
-  double dLat = lat2 - lat1;
-  double dLon = lon2 - lon1;
+    // Calculate the change in coordinates
+    double dLat = lat2 - lat1;
+    double dLon = lon2 - lon1;
 
-  // Haversine formula to calculate distance
-  double a = pow(sin(dLat / 2), 2) +
-      cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2);
-  double c = 2 * atan2(sqrt(a), sqrt(1 - a));
+    // Haversine formula to calculate distance
+    double a = pow(sin(dLat / 2), 2) +
+        cos(lat1) * cos(lat2) * pow(sin(dLon / 2), 2);
+    double c = 2 * atan2(sqrt(a), sqrt(1 - a));
 
-  // Calculate the distance in kilometers
-  double distance = earthRadius * c;
+    // Calculate the distance in kilometers
+    double distance = earthRadius * c;
 
-  return distance;
-}
+    return distance;
+  }
 
 }
