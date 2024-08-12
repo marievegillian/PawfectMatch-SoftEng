@@ -58,20 +58,10 @@ class Dog {
       'likedDogs': likedDogs,
     };
   }
-
-  String convertAndFormatDate(String birthday) {
-    DateFormat inputFormat = DateFormat('MMMM dd, yyyy');
-    DateTime birthDate = inputFormat.parse(birthday);
-    DateFormat outputFormat = DateFormat('yyyy-MM-dd');
-    return outputFormat.format(birthDate);
-  }
   
   int calculateAge() {
-    String formattedBirthday = convertAndFormatDate(birthday);
-
     DateTime now = DateTime.now();    
-    // DateTime birthDate = DateTime.parse(birthday);
-    DateTime birthDate = DateTime.parse(formattedBirthday);
+    DateTime birthDate = DateTime.parse(birthday);
     int age = now.year - birthDate.year;
     if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
       age--;
