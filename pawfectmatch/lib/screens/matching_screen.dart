@@ -29,92 +29,102 @@ class _MatchingScreenState extends State<MatchingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: CustomAppBar(
-        automaticallyImplyLeading: false,
-      ),
-      backgroundColor: Color(0xffF1F6F8),
-      body: BlocBuilder<SwipeBloc, SwipeState>(
-        builder: (context, state) {
-          if(state is SwipeLoaded) {
-            var dogCount = state.dogs.length;
-            return Column(
-              children: [
-              InkWell(
-                onDoubleTap: () {
-                  Navigator.pushNamed(context, '/dogs', 
-                  arguments: state.dogs[0]);
-                },
-                child: Draggable<Dog>(
-                            data: state.dogs[0],
-                            child: DogCard(dog: state.dogs[0]),
-                            feedback: DogCard(dog: state.dogs[0]),
-                            childWhenDragging: (dogCount > 1)
-                            ? DogCard(dog: state.dogs[1])
-                            : Container(),
-                            onDragEnd: (drag) {
-                if (drag.offset.dx < 0) {
-                  context.read<SwipeBloc>()..add(SwipeLeft(dogs: state.dogs[0]));
-                  print('Swiped left');
-                } else {
-                  context.read<SwipeBloc>()..add(SwipeRight(dogs: state.dogs[0], context: context));
-                  print('Swiped right');
-                }
-                            },
-                            ),
-              ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal:70 ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                InkWell(
-                  onTap: () {
-                    context.read<SwipeBloc>()..add(SwipeLeft(dogs: state.dogs[0]));
-                    print('Swiped left');
-                  },
-                  child: ChoiceButton(
-                    width: 70, 
-                    height: 70, 
-                    size: 30, 
-                    color: Colors.redAccent, 
-                    icon: Icons.clear_rounded,
-                    ),
-                ),
-                InkWell(
-                  onTap: () {
-                    context.read<SwipeBloc>()..add(SwipeRight(dogs: state.dogs[0], context: context));
-                    print('Swiped right');
-                  },
-                  child: ChoiceButton(
-                  width: 70, 
-                  height: 70, 
-                  size: 30, 
-                  color: Colors.greenAccent, 
-                  icon: Icons.favorite,
-                  ),
-                ),
-              ],
-            ),
+        return Scaffold(
+          appBar: CustomAppBar(
+            automaticallyImplyLeading: false,
           ),
-            ],
-            );
-          }
-          else if(state is SwipeLoading){
-            return Center(child: CircularProgressIndicator(),
-            );
-          }
-          if (state is SwipeError) {
-            return Center(
-              child: Text('Oh no, come back for more soon.',
-                  style: Theme.of(context).textTheme.headlineSmall),
-            );
-          } else {
-            return Text('Something went wrong.');
-          }
-        },
-      ),
-    );
+          backgroundColor: Color(0xffF1F6F8),
+          body: BlocBuilder<SwipeBloc, SwipeState>(
+            builder: (context, state) {
+              if (state is SwipeLoaded) {
+                var dogCount = state.dogs.length;
+                return Column(
+                  children: [
+                    Expanded(
+                      child: InkWell(
+                        onDoubleTap: () {
+                          Navigator.pushNamed(
+                            context,
+                            '/dogs',
+                            arguments: state.dogs[0],
+                          );
+                        },
+                        child: Draggable<Dog>(
+                          data: state.dogs[0],
+                          child: DogCard(dog: state.dogs[0]),
+                          feedback: DogCard(dog: state.dogs[0]),
+                          childWhenDragging: (dogCount > 1)
+                              ? DogCard(dog: state.dogs[1])
+                              : Container(),
+                          onDragEnd: (drag) {
+                            if (drag.offset.dx < 0) {
+                              context.read<SwipeBloc>()
+                                ..add(SwipeLeft(dogs: state.dogs[0]));
+                              print('Swiped left');
+                            } else {
+                              context.read<SwipeBloc>()
+                                ..add(SwipeRight(
+                                    dogs: state.dogs[0], context: context));
+                              print('Swiped right');
+                            }
+                          },
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 9.0, horizontal: 70),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              context.read<SwipeBloc>()..add(SwipeLeft(dogs: state.dogs[0]));
+                              print('Swiped left');
+                            },
+                            child: ChoiceButton(
+                              width: 70,
+                              height: 70,
+                              size: 30,
+                              color: Colors.redAccent,
+                              icon: Icons.clear_rounded,
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () {
+                              context.read<SwipeBloc>()..add(SwipeRight(dogs: state.dogs[0], context: context));
+                              print('Swiped right');
+                            },
+                            child: ChoiceButton(
+                              width: 70,
+                              height: 70,
+                              size: 30,
+                              color: Colors.greenAccent,
+                              icon: Icons.favorite,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              } else if (state is SwipeLoading) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (state is SwipeError) {
+                return Center(
+                  child: Text(
+                    'Oh no, come back for more soon.',
+                    style: Theme.of(context).textTheme.headlineSmall,
+                  ),
+                );
+              } else {
+                return Text('Something went wrong.');
+              }
+            },
+          ),
+        );
+
   }
 }
 
