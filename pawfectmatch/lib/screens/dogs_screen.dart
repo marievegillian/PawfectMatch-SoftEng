@@ -303,7 +303,7 @@ class DogsScreen extends StatelessWidget {
                                   ),
                                 ),
                               ),
-                              content: const Text('Are you sure you want to block this user?'),
+                              content: const Text('Are you sure you want to block this user? You cannot undo this action.'),
                               // ),
                               actions: <Widget>[
                                 // Column to stack buttons vertically
@@ -378,6 +378,16 @@ class DogsScreen extends StatelessWidget {
                         //   // Optionally, navigate back or perform additional actions
                         //   Navigator.pop(context);
                         // }
+                      
+                        // if (confirm == true) {
+                        //     context.read<SwipeBloc>().add(BlockOwner(dogs: state.dogs[0], context: context));
+                        //     Navigator.pop(context);
+                        // }
+
+                         if (confirm == true) {                          
+                            context.read<SwipeBloc>().add(BlockOwner(dogs: dog, context: context));
+                            Navigator.pop(context);  // Optionally, you can navigate back after blocking
+                          }
                     },
                     child: Center(
                       child: Text(
