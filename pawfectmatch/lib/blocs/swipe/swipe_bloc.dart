@@ -19,6 +19,7 @@ class SwipeBloc extends Bloc<SwipeEvent, SwipeState> {
     on<UpdateHome>(_onUpdateHome);
     on<SwipeLeft>(_onSwipeLeft);
     on<SwipeRight>(_onSwipeRight);
+    on<BlockOwner>(_onBlockOwner);
 
   }
 
@@ -37,13 +38,22 @@ void _onLoadDogs(
 
     // Fetch liked dogs
     final List<String> likedDogsOwners = await _databaseRepository.getLikedDogs();
+
+    // Fetch blocked owners
+    final List<String> blockedOwners = await _databaseRepository.getBlockedOwners();
     
     print('All Dogs: ${allDogs.map((dog) => dog.owner).toList()}');
     print('Liked Dogs Owners: $likedDogsOwners');
+    print('Blocked Owners: $blockedOwners');
 
     // Filter out liked dogs
-    final List<Dog> filteredDogs =
-        allDogs.where((dog) => !likedDogsOwners.contains(dog.owner)).toList();
+    // final List<Dog> filteredDogs =
+    //     allDogs.where((dog) => !likedDogsOwners.contains(dog.owner)).toList();
+
+    // Filter out liked dogs and blocked owners
+    final List<Dog> filteredDogs = allDogs.where((dog) =>
+        !likedDogsOwners.contains(dog.owner) &&
+        !blockedOwners.contains(dog.owner)).toList();
 
     print('Filtered Dogs: ${filteredDogs.map((dog) => dog.owner).toList()}');
 
@@ -139,5 +149,32 @@ void _showMatchedPopup(BuildContext context, String dogProfilePictureUrl) {
   );
 }
 
+
+void _onBlockOwner(
+  BlockOwner event,
+  Emitter<SwipeState> emit,
+) async {
+  if (state is SwipeLoaded) {
+    final state = this.state as SwipeLoaded;
+    //remove the liked dog/s from the list of dogs to be displayed in the matching screen 
+    // List<Dog> dogs = List.from(state.dogs)..remove(event.dogs);   
+    List<Dog> dogs = List.from(state.dogs)
+      ..removeWhere((dog) => dog.owner == event.dogs.owner);   
+   
+    if (dogs.isNotEmpty) {
+      emit(SwipeLoaded(dogs: dogs));
+
+      // Get the owner ID of the swiped dog
+      String blockedOwnerId = event.dogs.owner;
+
+      // Update the likedDogs collection in Firestore
+      await _databaseRepository.updateBlockedOwnersInFirestore(blockedOwnerId);
+      print('User blocked successfully');
+
+    } else {
+      emit(SwipeError());
+    }
+  }
+}
   
 }

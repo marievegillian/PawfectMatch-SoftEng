@@ -50,3 +50,16 @@ class SwipeRight extends SwipeEvent{
   List<Object> get props => [dogs];
 }
 
+class BlockOwner extends SwipeEvent{
+  final Dog dogs;
+  final BuildContext context; // Include BuildContext in the event
+
+  const BlockOwner({
+    required this.dogs,
+    required this.context,
+  });
+
+
+  @override
+  List<Object> get props => [dogs];
+}

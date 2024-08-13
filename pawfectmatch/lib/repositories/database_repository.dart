@@ -76,16 +76,28 @@
   }
 
 
-    Future<void> updateLikedDogsInFirestore(String likedDogOwnerId) async {
-      try {
-        String loggedInUserId = loggedInDogUid;
-        print('Liked Dogs Owner: $likedDogOwnerId');
-        await FirebaseService().updateLikedDogs(loggedInUserId, [likedDogOwnerId]);
-        
-      } catch (e) {
-        print('Error updating liked dogs in Firestore: $e');
-      }
+  Future<void> updateLikedDogsInFirestore(String likedDogOwnerId) async {
+    try {
+      String loggedInUserId = loggedInDogUid;
+      print('Liked Dogs Owner: $likedDogOwnerId');
+      await FirebaseService().updateLikedDogs(loggedInUserId, [likedDogOwnerId]);
+      
+    } catch (e) {
+      print('Error updating liked dogs in Firestore: $e');
     }
+  }
+
+  Future<void> updateBlockedOwnersInFirestore(String blockedOwnerId) async {
+    try {
+      String loggedInUserId = loggedInOwner;
+      
+      print('Blocked Dogs Owner: $blockedOwnerId');
+      await FirebaseService().updateBlockedOwners(loggedInUserId, [blockedOwnerId]);
+      
+    } catch (e) {
+      print('Error updating blocked owners in Firestore: $e');
+    }
+  }
     
   Future<bool> isDogLiked(String dogOwnerId, String likedDogOwnerId) async { //PROBLEMATIC
     try {
@@ -164,6 +176,33 @@
       return [];
     }
   }
+
+  Future<List<String>> getBlockedOwners() async {
+    try {
+      // String loggedInUserId = loggedInOwner;
+
+      // Fetch the 'blockedUsers' collection for the logged-in user
+      // CollectionReference<Map<String, dynamic>> blockedOwnersCollection =
+      //     FirebaseService().dogsCollection.doc(loggedInUserId).collection('blockedUsers');
+
+       CollectionReference<Map<String, dynamic>> blockedOwnersCollection =
+          _firebaseFirestore.collection('users').doc(loggedInOwner).collection('blockedUsers');
+
+      // Get the documents in the 'blockedUsers' subcollection
+      QuerySnapshot<Map<String, dynamic>> blockedOwnersSnapshot =
+          await blockedOwnersCollection.get();
+
+      // Extract the owner IDs of the blocked users
+      List<String> blockedOwners = blockedOwnersSnapshot.docs.map((doc) => doc.id).toList();
+
+      return blockedOwners;
+    } catch (e) {
+      print('Error fetching blocked owners from Firestore: $e');
+      return [];
+    }
+  }
+
+
 
   Future<List<Match>> getMatches() async {
     try {

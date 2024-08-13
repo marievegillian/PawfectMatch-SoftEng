@@ -12,6 +12,7 @@ class Dog {
   String profilePicture;
   double avgRating;
   List<String> likedDogs; // New field for storing liked dog IDs
+  List<String> blockedUsers; 
 
   Dog({
     required this.bio,
@@ -25,6 +26,7 @@ class Dog {
     required this.profilePicture,
     required this.avgRating,
     this.likedDogs = const [], // Initialize with an empty list
+    this.blockedUsers= const [], // Initialize with an empty list
   });
 
   factory Dog.fromJson(Map<String, dynamic> json) {
@@ -40,6 +42,7 @@ class Dog {
       profilePicture: json['profilepicture'] ?? '',
       avgRating: (json['avgRating'] ?? 0).toDouble(),
       likedDogs: List<String>.from(json['likedDogs'] ?? []),
+      blockedUsers: List<String>.from(json['blockedUsers'] ?? []),
     );
   }
 
@@ -56,6 +59,7 @@ class Dog {
       'profilepicture': profilePicture,
       'avgRating': avgRating,
       'likedDogs': likedDogs,
+      'blockedUsers': blockedUsers,
     };
   }
   

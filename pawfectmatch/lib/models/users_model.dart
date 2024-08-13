@@ -8,7 +8,7 @@ class Users {
   final String profilePicture;
   final String username;
   List<String> likedDogs; // New field for storing liked dog IDs
-
+  List<String> blockedUsers;
 
   Users({
     required this.contactNumber,
@@ -20,7 +20,7 @@ class Users {
     required this.profilePicture,
     required this.username,
     this.likedDogs = const [], // Initialize with an empty list
-
+    this.blockedUsers = const [], // Initialize with an empty list
   });
 
   factory Users.fromJson(Map<String, dynamic> json) {
@@ -34,6 +34,7 @@ class Users {
       profilePicture: json['profilepicture'] ?? '',
       username: json['username'] ?? '',
       likedDogs: List<String>.from(json['likedDogs'] ?? []), // Parse liked dogs from JSON
+      blockedUsers: List<String>.from(json['blockedUsers'] ?? []),
 
     );
   }
@@ -45,6 +46,16 @@ class Users {
 
   // Method to remove a liked dog ID
   void removeLikedDog(String dogId) {
+    likedDogs.remove(dogId);
+  }
+
+  
+  void addblockedUser(String dogId) {
+    likedDogs.add(dogId);
+  }
+
+  
+  void removeblockedUser(String dogId) {
     likedDogs.remove(dogId);
   }
 
@@ -60,6 +71,7 @@ class Users {
       'profilepicture': profilePicture,
       'username': username,
       'likedDogs': likedDogs,
+      'blockedUsers': blockedUsers,
     };
   }
   
