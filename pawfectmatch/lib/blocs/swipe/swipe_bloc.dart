@@ -91,8 +91,9 @@ void _onSwipeRight(
 ) async {
   if (state is SwipeLoaded) {
     final state = this.state as SwipeLoaded;
-    List<Dog> dogs = List.from(state.dogs)..remove(event.dogs);
-
+    //remove the liked dog/s from the list of dogs to be displayed in the matching screen 
+    List<Dog> dogs = List.from(state.dogs)..remove(event.dogs);      
+   
     if (dogs.isNotEmpty) {
       emit(SwipeLoaded(dogs: dogs));
 

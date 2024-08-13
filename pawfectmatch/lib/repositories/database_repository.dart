@@ -87,19 +87,19 @@
       }
     }
     
-  Future<bool> isDogLiked(String dogOwnerId, String likedDogOwnerId) async {
+  Future<bool> isDogLiked(String dogOwnerId, String likedDogOwnerId) async { //PROBLEMATIC
     try {
-      // Get the dogOwned by awaiting the result of getDogOwned
-      String? dog1 = await getDogOwned(dogOwnerId);
+      //the ID of the DOG of the liked owner
+       String? dog1 = await getOwnedDogID(likedDogOwnerId); 
 
       if (dog1.isNotEmpty) {
         CollectionReference<Map<String, dynamic>> likedDogsCollection =
             _firebaseFirestore.collection('dogs').doc(dog1).collection('likedDogs');
 
-        print('Checking if $likedDogOwnerId is liked by $dog1');
+        print('Checking if $dogOwnerId is liked by $dog1');
 
         // Check if the document exists in 'likedDogs' subcollection
-        bool isLiked = (await likedDogsCollection.doc(likedDogOwnerId).get()).exists;
+        bool isLiked = (await likedDogsCollection.doc(dogOwnerId).get()).exists;
 
         print('Result: $isLiked');
 
@@ -115,21 +115,48 @@
     }
   }
 
+  Future<String> getOwnedDogID(String ownerId) async {
+    try {
+      // Get a reference to the 'user' document
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+          await _firebaseFirestore.collection('users').doc(ownerId).get();
 
-  Future<List<String>> getLikedDogs() async {
+      // Check if the document exists
+      if (userSnapshot.exists) {
+        // Retrieve the 'dog' field from the document
+        String dogOwned = userSnapshot.data()?['dog'];
+        print('got the dog owned: $dogOwned');
+
+        return dogOwned;      
+      } else {
+        print('User document not found for ownerId: $ownerId');
+        return '';
+      }
+    } catch (error) {
+      print('Error getting dogOwned: $error');
+      return '';
+    }
+  }
+
+  Future<List<String>> getLikedDogs() async { 
     try {
       // Get a reference to the 'likedDogs' subcollection for the logged-in dog
       CollectionReference<Map<String, dynamic>> likedDogsCollection =
           _firebaseFirestore.collection('dogs').doc(loggedInDogUid).collection('likedDogs');
 
+       print("got the reference");
+
       // Get all documents in the 'likedDogs' subcollection
       QuerySnapshot<Map<String, dynamic>> likedDogsSnapshot =
           await likedDogsCollection.get();
+
+      print("got all docs in the likedDogs");
 
       // Extract the 'owner' field from each document
       List<String> likedDogOwners = likedDogsSnapshot.docs
           .map((doc) => doc.data()['owner'] as String)
           .toList();
+      print("owner extracted");
 
       return likedDogOwners;
     } catch (error) {
@@ -205,7 +232,8 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
       setLoggedInDog();
 
       // Check if the liked dog has liked the current user's dog
-      bool isMatch = await isDogLiked(likedDogOwnerId, loggedInOwner) && await isDogLiked(loggedInOwner, likedDogOwnerId);
+      // bool isMatch = await isDogLiked(likedDogOwnerId, loggedInOwner) && await isDogLiked(loggedInOwner, likedDogOwnerId); //orig implementation(bug?)
+      bool isMatch = await isDogLiked(loggedInOwner, likedDogOwnerId);
 
       return isMatch;
     } catch (error) {
