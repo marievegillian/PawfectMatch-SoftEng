@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "247180526908",
-    "project_id": "softeng-pawfectmatch",
-    "storage_bucket": "softeng-pawfectmatch.appspot.com"
+    "project_number": "400047742252",
+    "project_id": "softeng-pawfectmatch1",
+    "storage_bucket": "softeng-pawfectmatch1.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:247180526908:android:5b82e34a44079345048a39",
+        "mobilesdk_app_id": "1:400047742252:android:9125c472b87806c1fa2089",
         "android_client_info": {
           "package_name": "com.example.pawfectmatch"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyC1j32hlrEpu9TyuKOJuWQ77-DHZObjQe4"
+          "current_key": "AIzaSyBGHzSEr9EnBSg2Y1ApRPkCHHksP9zb9u8"
         }
       ],
       "services": {
