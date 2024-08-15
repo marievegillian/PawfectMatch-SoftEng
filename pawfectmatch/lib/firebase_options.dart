@@ -41,49 +41,49 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDRWYn8TMWMFM0QxrWi-PnZHScnme_N9fU',
-    appId: '1:247180526908:web:9f6769c43086574e048a39',
-    messagingSenderId: '247180526908',
-    projectId: 'softeng-pawfectmatch',
-    authDomain: 'softeng-pawfectmatch.firebaseapp.com',
-    storageBucket: 'softeng-pawfectmatch.appspot.com',
-    measurementId: 'G-6LMXP7351Q',
+    apiKey: 'AIzaSyAz9gEeksYS11GZdc0mpsBxCm0kmafqpHg',
+    appId: '1:400047742252:web:49112c697c7a1072fa2089',
+    messagingSenderId: '400047742252',
+    projectId: 'softeng-pawfectmatch1',
+    authDomain: 'softeng-pawfectmatch1.firebaseapp.com',
+    storageBucket: 'softeng-pawfectmatch1.appspot.com',
+    measurementId: 'G-VQWFJQH2WJ',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyC1j32hlrEpu9TyuKOJuWQ77-DHZObjQe4',
-    appId: '1:247180526908:android:5b82e34a44079345048a39',
-    messagingSenderId: '247180526908',
-    projectId: 'softeng-pawfectmatch',
-    storageBucket: 'softeng-pawfectmatch.appspot.com',
+    apiKey: 'AIzaSyBGHzSEr9EnBSg2Y1ApRPkCHHksP9zb9u8',
+    appId: '1:400047742252:android:9125c472b87806c1fa2089',
+    messagingSenderId: '400047742252',
+    projectId: 'softeng-pawfectmatch1',
+    storageBucket: 'softeng-pawfectmatch1.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyCrA8CV2Pd3iksOsKxT8yNMoJyQYLzkNEY',
-    appId: '1:247180526908:ios:60d5e6141e29d722048a39',
-    messagingSenderId: '247180526908',
-    projectId: 'softeng-pawfectmatch',
-    storageBucket: 'softeng-pawfectmatch.appspot.com',
+    apiKey: 'AIzaSyCPoblkdCklOBI8OUeA6-0FqjhEcg1ekXo',
+    appId: '1:400047742252:ios:089f30435ba39817fa2089',
+    messagingSenderId: '400047742252',
+    projectId: 'softeng-pawfectmatch1',
+    storageBucket: 'softeng-pawfectmatch1.appspot.com',
     iosBundleId: 'com.example.pawfectmatch',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyCrA8CV2Pd3iksOsKxT8yNMoJyQYLzkNEY',
-    appId: '1:247180526908:ios:60d5e6141e29d722048a39',
-    messagingSenderId: '247180526908',
-    projectId: 'softeng-pawfectmatch',
-    storageBucket: 'softeng-pawfectmatch.appspot.com',
+    apiKey: 'AIzaSyCPoblkdCklOBI8OUeA6-0FqjhEcg1ekXo',
+    appId: '1:400047742252:ios:089f30435ba39817fa2089',
+    messagingSenderId: '400047742252',
+    projectId: 'softeng-pawfectmatch1',
+    storageBucket: 'softeng-pawfectmatch1.appspot.com',
     iosBundleId: 'com.example.pawfectmatch',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyDRWYn8TMWMFM0QxrWi-PnZHScnme_N9fU',
-    appId: '1:247180526908:web:1627cb175e8eab09048a39',
-    messagingSenderId: '247180526908',
-    projectId: 'softeng-pawfectmatch',
-    authDomain: 'softeng-pawfectmatch.firebaseapp.com',
-    storageBucket: 'softeng-pawfectmatch.appspot.com',
-    measurementId: 'G-C4CLKBSXH5',
+    apiKey: 'AIzaSyAz9gEeksYS11GZdc0mpsBxCm0kmafqpHg',
+    appId: '1:400047742252:web:da9ae4593d5cee41fa2089',
+    messagingSenderId: '400047742252',
+    projectId: 'softeng-pawfectmatch1',
+    authDomain: 'softeng-pawfectmatch1.firebaseapp.com',
+    storageBucket: 'softeng-pawfectmatch1.appspot.com',
+    measurementId: 'G-1X7KQ84CVJ',
   );
 
 }
