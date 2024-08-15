@@ -6,3 +6,4 @@ export 'conversation_model.dart';
 export 'review_model.dart';
 export 'appointment_model.dart';
 export 'promptbot_model.dart';
+export 'promptmessages_model.dart';
