@@ -2,7 +2,7 @@ import requests
 
 url = "http://127.0.0.1:5000/filter_dogs"
 data = {
-    "user_input": "I want a loyal social strong-willed cheerful labrador dog"
+    "user_input": "I want a small and smart chihuahua dog"
 }
 response = requests.post(url, json=data)
 
