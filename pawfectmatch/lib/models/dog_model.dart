@@ -12,7 +12,7 @@ class Dog {
   String profilePicture;
   double avgRating;
   List<String> likedDogs; // New field for storing liked dog IDs
-  List<String> blockedUsers; 
+  List<String> blockedUsers;
 
   Dog({
     required this.bio,
@@ -26,7 +26,7 @@ class Dog {
     required this.profilePicture,
     required this.avgRating,
     this.likedDogs = const [], // Initialize with an empty list
-    this.blockedUsers= const [], // Initialize with an empty list
+    this.blockedUsers = const [], // Initialize with an empty list
   });
 
   factory Dog.fromJson(Map<String, dynamic> json) {
@@ -62,12 +62,13 @@ class Dog {
       'blockedUsers': blockedUsers,
     };
   }
-  
+
   int calculateAge() {
-    DateTime now = DateTime.now();    
+    DateTime now = DateTime.now();
     DateTime birthDate = DateTime.parse(birthday);
     int age = now.year - birthDate.year;
-    if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
+    if (now.month < birthDate.month ||
+        (now.month == birthDate.month && now.day < birthDate.day)) {
       age--;
     }
     return age;
