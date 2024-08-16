@@ -35,7 +35,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:pawfectmatch/models/models.dart';
-
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'dog_profile.dart';
 /*
 class PromptBotController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -150,13 +152,14 @@ class PromptBotController {
 
 }
 */
+
 class PromptBotController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   Future<List<PromptMessage>> getMessages(String userID) async {
     try {
       // Assuming you have a collection 'conversations' with documents for each user
       QuerySnapshot<Map<String, dynamic>> snapshot = await _firestore
-          .collection('conversations')
+          .collection('promptConversations')
           .doc(userID)
           .collection('messages')
           .orderBy('timestamp', descending: false)
@@ -237,6 +240,22 @@ class PromptBotController {
       }
     } catch (e) {
       print('Error sending bot reply: $e');
+    }
+  }
+
+  Future<List<DogProfile>> fetchDogProfiles(String userInput) async {
+    final url = 'http://127.0.0.1:5000/filter_dogs';
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({'input': userInput}),
+    );
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      // Assuming the AI returns a list of dog profiles in JSON
+      return data.map((json) => DogProfile.fromJson(json)).take(3).toList();
+    } else {
+      throw Exception('Failed to load dog profiles');
     }
   }
 }
