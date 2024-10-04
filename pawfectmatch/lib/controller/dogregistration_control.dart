@@ -33,8 +33,9 @@ class DogRegistrationControl {
       Gender? gender,
       String breed,
       DateTime selectedDate,
-      String medID,
+      // String medID,
       Vaccinated? vaxstatus,
+      List<Map<String,dynamic>> selectedVaccines,
       Uint8List? image,
       BuildContext context) async {
     bool isMale = true;
@@ -52,7 +53,8 @@ class DogRegistrationControl {
       breed: breed,
       isMale: isMale,
       isVaccinated: isVax,
-      medID: medID,
+      vaccines: selectedVaccines,
+      // medID: medID, //medID field is removed, but commented for now
       name: name,
       owner: uid,
       profilePicture: '',
