@@ -1,5 +1,7 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:http/http.dart' as http;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -29,12 +31,35 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
   String breed = '';
   bool isMale = true;
   bool isVaccinated = true;
+  List<Map<String,dynamic>> vaccines = [];
+  String? purpose = '';
+  List<String>? activities = [];
   String medID = '';
   Uint8List? image;
   DateTime selectedDate = DateTime.now();
   var formatter = DateFormat('yyyy-MM-dd');
+
   Vaccinated? selectedVaxStatus;
+  List<Map<String, dynamic>> selectedVaccines = [];
+  List<String> selectedInterests = [];
+  String? selectedPurpose;
   bool isBirthdayChanged = false;
+
+  List<String> _dogBreeds = [];
+  bool isLoading = true;
+
+  final List<String> interests = [
+    'Hiking', 'Walks', 'Playing Catch', 'Swimming',
+    'Gobbling on treats', 'Performing tricks',
+    'Tug of War', 'Agility Courses', 'Chasing',
+    'Digging', 'Cuddling', 'Fetching', 'Scent Tracking', 'Running'
+  ];
+
+   final List<String> purposes = [
+    'Breeding partner for my dog',
+    'Companion to hang out with',
+    'Still figuring it out'
+  ];
 
   DatabaseRepository databaseRepository = DatabaseRepository();
 
@@ -93,6 +118,9 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
       breed = dog.breed;
       isMale = dog.isMale;
       isVaccinated = dog.isVaccinated;
+      vaccines = dog.vaccines;
+      purpose = dog.purpose;
+      activities = dog.activities;
       // medID = dog.medID;
 
       // Update the UI with the contact number
@@ -117,6 +145,47 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
       });
     }
   }
+  
+   // Fetch dog breeds from the API and flatten the JSON structure
+  Future<void> fetchDogBreeds() async {
+    final response = await http.get(Uri.parse('https://dog.ceo/api/breeds/list/all')); // Replace with your API URL
+    if (response.statusCode == 200) {
+      Map<String, dynamic> jsonData = jsonDecode(response.body);
+
+      // Extract the "message" part of the response which contains the breeds
+      Map<String, dynamic> breedData = jsonData['message'];
+      
+      List<String> flattenedBreeds = [];
+
+      // Flatten the JSON structure
+      breedData.forEach((key, value) {
+        if (value is List && value.isEmpty) {
+          // If there are no sub-breeds, add the main breed
+          flattenedBreeds.add(_capitalize(key));
+        } else if (value is List) {
+          // If there are sub-breeds, combine them with the main breed
+          value.forEach((subBreed) {
+            flattenedBreeds.add(_capitalize(subBreed) + ' ' + _capitalize(key));
+          });
+        } else {
+          // Fallback if value is not a list
+          flattenedBreeds.add(_capitalize(key));
+        }
+      });
+
+      // Update the UI with the flattened breeds
+      setState(() {
+        _dogBreeds = flattenedBreeds;
+        isLoading = false;
+      });
+    } else {
+      throw Exception('Failed to load dog breeds');
+    }
+  }
+
+  // Helper function to capitalize the first letter of each word
+  String _capitalize(String s) => s[0].toUpperCase() + s.substring(1);
+
 
   Future<void> confirmEditProfile(
     String newName,
@@ -125,6 +194,10 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
     String newBirthday,
     // String newMedID, //medID field is removed, but commented for now
     Vaccinated? newVaxStatus,
+    List<Map<String, dynamic>> newVaccines,    
+    String? newPurpose,
+    List <String>? newActivities,
+   
   ) async {
     bool isVax;
     (newVaxStatus == Vaccinated.isVaccinated) ? isVax = true : isVax = false;
@@ -135,7 +208,10 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
         newBreed.isEmpty &&
         newBirthday.isEmpty &&
         // newMedID.isEmpty && //medID field is removed, but commented for now
-        newVaxStatus == selectedVaxStatus) {
+        newVaxStatus == selectedVaxStatus &&
+        newVaccines.isEmpty &&
+        (newPurpose == null || newPurpose.isEmpty) &&        
+        (newActivities == null || newActivities.isEmpty)) {
       // No changes, simply close the dialog
       Navigator.pop(context);
       return;
@@ -164,6 +240,21 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
       updatedFields['birthday'] = newBirthday;
     } else {
       updatedFields['birthday'] = birthday;
+    }
+    if (newVaccines.isNotEmpty) {
+      updatedFields['vaccines'] = newVaccines;
+    } else {
+      updatedFields['vaccines'] = vaccines;
+    }
+    if (newPurpose != null && newPurpose.isNotEmpty) {
+      updatedFields['purpose'] = newPurpose;
+    } else {
+      updatedFields['purpose'] = purpose;
+    }
+    if (newActivities != null && newActivities.isNotEmpty) {
+      updatedFields['activities'] = newActivities;
+    } else {
+      updatedFields['activities'] = activities; // or existing value
     }
     //medID field is removed, but commented for now
     // if (newMedID.isNotEmpty) {
@@ -205,21 +296,48 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
     );
   }
 
+  // Function to print selected vaccines (optional for debugging)
+    void printSelectedVaccines() {
+      print("Selected Vaccines:");
+      for (var vaccine in selectedVaccines) {
+        print('Vaccine Name: ${vaccine['name']}, Date: ${vaccine['date']}');
+      }
+    } 
+    
+    Widget buildVaccineCheckbox(String vaccineName) {
+      return StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+        return CheckboxListTile(
+          title: Text(vaccineName),
+          // Ensure the value reflects the selection status
+          value: selectedVaccines.any((vaccine) => vaccine['name'] == vaccineName),
+          onChanged: (bool? isSelected) {
+            setState(() {
+              if (isSelected != null && isSelected) {
+                // Add the vaccine if selected
+                selectedVaccines.add({'name': vaccineName, 'date': DateTime.now().toString()});
+              } else {
+                // Remove the vaccine if unselected
+                selectedVaccines.removeWhere((vaccine) => vaccine['name'] == vaccineName);
+              }
+
+              // Print the updated list to the console
+              printSelectedVaccines();
+            });
+          },
+        );
+      });
+    }
+
   Future<void> showEditProfileDialog() async {
     final TextEditingController _nameTxtCtrl = TextEditingController();
     final TextEditingController _bioTxtCtrl = TextEditingController();
     final TextEditingController _breedTxtCtrl = TextEditingController();
-    // final TextEditingController _medTxtCtrl = TextEditingController();
+    // final TextEditingController _medTxtCtrl = TextEditingController();  
 
     selectedVaxStatus =
         isVaccinated ? Vaccinated.isVaccinated : Vaccinated.isNotVaccinated;
 
-    // await showDialog(
-    //   context: context,
-    //   builder: (BuildContext context) {
-
-    //   },
-    // );
     await showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -308,12 +426,49 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                               keyboardType: TextInputType.multiline,
                             ),
                             const SizedBox(height: 20),
-                            const Text("Breed",
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 18, color: Color(0xff011F3F))),
-                            reusableInputTextField("Enter your dog's breed",
-                                _breedTxtCtrl, TextInputType.text),
+
+                            const Text("Breed"),                              
+                              Autocomplete<String>(
+                                optionsBuilder: (TextEditingValue textEditingValue) {
+                                  if (textEditingValue.text == '') {
+                                      return const Iterable<String>.empty();
+                                    }
+                                    return _dogBreeds.where((String breed) {
+                                      return breed.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                                    });                    
+                                },
+                                onSelected: (String selection) {
+                                  _breedTxtCtrl.text = selection; // Set the selected breed to the text controller
+                                  print('Selected: $selection');
+                                },
+                                fieldViewBuilder: (BuildContext context,
+                                    TextEditingController fieldTextEditingController,
+                                    FocusNode focusNode,
+                                    VoidCallback onFieldSubmitted) {
+                                  return TextField(
+                                    controller: fieldTextEditingController, // Use the internal controller of the Autocomplete
+                                    focusNode: focusNode,
+                                    cursorColor: Colors.white,
+                                    style: TextStyle(
+                                      color: const Color(0xff011F3F).withOpacity(0.9),
+                                    ),
+                                    decoration: InputDecoration(
+                                      labelText: "Enter your dog's breed",
+                                      labelStyle: TextStyle(
+                                        color: const Color(0xff011F3F).withOpacity(0.9),
+                                      ),
+                                      filled: true,
+                                      floatingLabelBehavior: FloatingLabelBehavior.never,
+                                      fillColor: Colors.white.withOpacity(0.3),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(5),
+                                        borderSide: const BorderSide(width: 0, style: BorderStyle.solid),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                                
                             const SizedBox(height: 20),
                             const Text("Birthday",
                                 textAlign: TextAlign.left,
@@ -351,6 +506,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                                   ),
                                 )),
                             const SizedBox(height: 20),
+
                             //medID field is removed, but commented for now
                             // const Text("Medical ID",
                             //     textAlign: TextAlign.left,
@@ -360,6 +516,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                             //     "Enter your dog's Medical ID",
                             //     _medTxtCtrl,
                             //     TextInputType.text), 
+
                             const SizedBox(height: 20),
                             const Text("Vaccination Status",
                                 textAlign: TextAlign.left,
@@ -386,12 +543,23 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
 
                                 // Add some spacing between radio buttons
                                 // Radio button for Female
+                            
                                 Radio(
                                   value: Vaccinated.isNotVaccinated,
                                   groupValue: selectedVaxStatus,
                                   onChanged: (value) {
                                     setState(() {
                                       selectedVaxStatus = value as Vaccinated;
+
+                                      // If "Not Vaccinated" is selected, clear the vaccines list
+                                      if (selectedVaxStatus == Vaccinated.isNotVaccinated) {
+                                        selectedVaccines.clear();
+                                        print("Vaccine list cleared due to 'Not Vaccinated' selection.");
+                                      }
+
+                                      // Optionally print the updated vaccination status and vaccine list
+                                      print('Vaccination Status: $selectedVaxStatus');
+                                      printSelectedVaccines();
                                     });
                                   },
                                 ),
@@ -402,6 +570,104 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                                         color: Color(0xff011F3F))),
                               ],
                             ),
+
+                            Visibility(
+                              visible: selectedVaxStatus == Vaccinated.isVaccinated,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text("Select Vaccines", style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
+                                  buildVaccineCheckbox('Rabies'),
+                                  buildVaccineCheckbox('Distemper'),
+                                  buildVaccineCheckbox('Hepatitis'),
+                                  buildVaccineCheckbox('Parainfluenza'),
+                                  buildVaccineCheckbox('Parvovirus'),
+                                  buildVaccineCheckbox('Leptospirosis'),
+                                  buildVaccineCheckbox('Bordetella (Kennel Cough)'),   
+                                  buildVaccineCheckbox('Lyme Disease'), 
+                                  buildVaccineCheckbox('Canine Influenza'),  
+                                  buildVaccineCheckbox('Coronavirus'),      
+                                  buildVaccineCheckbox('Canine Herpes Virus'),                                   
+                                ],
+                              ),
+                            ),
+
+                            Text(
+                              'What are you looking for?',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            ...purposes.map((purpose) => RadioListTile<String>(
+                                  title: Text(purpose),
+                                  value: purpose,
+                                  groupValue: selectedPurpose,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      selectedPurpose = value;
+                                    });
+                                  },
+                                  contentPadding: EdgeInsets.symmetric(vertical: 0), // Set padding to reduce gap
+                                )),
+                            SizedBox(height: 20),
+                            
+                            Text(
+                              'What activities do your dog enjoy?',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            SizedBox(height: 5),                            
+                            Container(
+                              height: 300,                             
+                              child: SingleChildScrollView( // In case there are many interests
+                                child: Wrap(
+                                  spacing: 10, // Horizontal space between items
+                                  runSpacing: 10, // Vertical space between rows
+                                  children: interests.map((interest) {
+                                    bool isSelected = selectedInterests.contains(interest);                                    
+
+                                      void toggleInterest(String interest) {
+                                        setState(() {
+                                          if (selectedInterests.contains(interest)) {
+                                            selectedInterests.remove(interest); // Deselect if already selected
+                                          } else {
+                                            selectedInterests.add(interest); // Add to selected if not already
+                                          }
+                                        });
+                                      }
+
+                                      return GestureDetector(
+                                        onTap: () => toggleInterest(interest),
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          padding: EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                                          decoration: BoxDecoration(
+                                            color: isSelected ? Colors.blueAccent : Colors.grey[300],
+                                            borderRadius: BorderRadius.circular(30),
+                                            border: Border.all(
+                                              color: isSelected ? Colors.blueAccent : Colors.grey,
+                                              width: 2,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            interest,
+                                            textAlign: TextAlign.center,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              color: isSelected ? Colors.white : Colors.black,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      );    
+                                  }).toList(),
+                                ),                                           
+                              ),     
+                            ),                          
+
                           ],
                         ),
                       ),
@@ -419,7 +685,11 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                                 _breedTxtCtrl.text,
                                 formatter.format(selectedDate),
                                 // _medTxtCtrl.text, //medID field is removed, but commented for now
-                                selectedVaxStatus);
+                                selectedVaxStatus,
+                                selectedVaccines,
+                                selectedPurpose,
+                                selectedInterests
+                                );
                           },
                           style: ButtonStyle(
                               backgroundColor:
@@ -451,7 +721,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
           },
         );
       },
-    );
+    );    
   }
 
   @override
@@ -459,6 +729,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
     super.initState();
     uid = FirebaseAuth.instance.currentUser!.uid;
     fetchUserData();
+    fetchDogBreeds();
   }
 
   @override
@@ -562,13 +833,31 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                 child: Column(
                   children: [
                     const SizedBox(height: 10),
-                    const Text(
-                      "Dog's Information",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                    const Center(
+                      child: Text(
+                        "Dog's Information",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
                       ),
                     ),
+                    const SizedBox(height: 20),
+                    const Center(
+                      child: Text("Looking for:",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500)),
+                    ),
+                     Text(
+                      (purpose != null && purpose!.isNotEmpty) ? purpose! : 'Still figuring it out',
+                       textAlign: TextAlign.center,
+                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                    ),
+
                     const SizedBox(height: 20),
                     const Text("Bio:",
                         style: TextStyle(
@@ -577,8 +866,9 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                             fontWeight: FontWeight.w500)),
                     Text(
                       bio.isNotEmpty ? bio : 'Bio',
+                       textAlign: TextAlign.center,
                       style: const TextStyle(fontSize: 16, color: Colors.black),
-                    ),
+                    ),                    
                     const SizedBox(height: 20),
                     const Text("Gender:",
                         style: TextStyle(
@@ -610,25 +900,102 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                       style: const TextStyle(fontSize: 16, color: Colors.black),
                     ),
                     const SizedBox(height: 20),
-                    const Text("Medical ID:",
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500)),
+                    // const Text("Medical ID:", //medid to be removed
+                    //     style: TextStyle(
+                    //         fontSize: 18,
+                    //         color: Colors.black,
+                    //         fontWeight: FontWeight.w500)),
+                    // Text(
+                    //   medID.isNotEmpty ? medID : 'Medical ID',
+                    //   style: const TextStyle(fontSize: 16, color: Colors.black),
+                    // ),
+                    // const SizedBox(height: 20),
+                    const Center(
+                      child: Text("Vaccination Status:",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(                            
+                              fontSize: 18,
+                              color: Colors.black,
+                              fontWeight: FontWeight.w500)),
+                    ),
                     Text(
-                      medID.isNotEmpty ? medID : 'Medical ID',
+                      isVaccinated ? "Vaccinated" : 'Incomplete',
                       style: const TextStyle(fontSize: 16, color: Colors.black),
                     ),
                     const SizedBox(height: 20),
-                    const Text("Vaccination Status:",
-                        style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500)),
-                    Text(
-                      isVaccinated ? "Complete" : 'Incomplete',
-                      style: const TextStyle(fontSize: 16, color: Colors.black),
+                      const Center(
+                        child: Text("Vaccinated for:",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w500)),
+                      ),                           
+                    vaccines.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                      children: List.generate(
+                        vaccines.length,
+                        (index) => Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: Colors.green, // Check icon color
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              vaccines[index]['name'], // Assuming the vaccine name is stored under 'name'
+                              style: const TextStyle(fontSize: 16),
+                            ),                            
+                          ],
+                        ),
+                      ),
+                    ),              
+                    
+                    const SizedBox(height: 20),
+                    const Center(
+                      child: Text("Dog's Interests:",                            
+                            style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                                fontWeight: FontWeight.w500)),
                     ),
+                    const SizedBox(height: 5),
+                    activities == null || activities!.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : Wrap(
+                      alignment: WrapAlignment.center, // Center the boxes
+                      spacing: 10, // Horizontal space between boxes
+                      runSpacing: 5, // Vertical space between boxes
+                      children: activities!.map((activityName) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            gradient: LinearGradient(colors: [
+                              Colors.blueGrey,
+                              Colors.black,
+                            ]),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 15),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min, // Make the width adjust based on text length
+                            children: [
+                              Text(
+                                activityName, // Display the activity name
+                                style: const TextStyle(
+                                  fontSize: 15.0,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+
+                    //insert fetched dog interests
                   ],
                 ),
               )
@@ -639,4 +1006,6 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
       bottomNavigationBar: null,
     );
   }
+
+
 }

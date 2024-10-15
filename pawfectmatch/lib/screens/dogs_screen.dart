@@ -173,6 +173,23 @@ class DogsScreen extends StatelessWidget {
                   },
                 ),
                 SizedBox(height: 15,),
+                const Text('Currently looking for...', 
+                style:TextStyle(
+                      fontSize: 15.0,
+                      fontFamily: 'Roboto',
+                      // fontWeight: FontWeight.bold, 
+                      color: Colors.grey
+                      ),
+                    ),
+                Text('${dog.purpose}', 
+                style:TextStyle(
+                      fontSize: 22.0,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.black
+                      ),
+                    ),
+                SizedBox(height: 15,),
                 const Text('Bio', 
                 style:TextStyle(
                       fontSize: 20.0,
@@ -218,6 +235,52 @@ class DogsScreen extends StatelessWidget {
                       color: Colors.white)
                           )
                       ),
+
+                SizedBox(height: 10,),
+                Text('Interests', 
+                style:TextStyle(
+                      fontSize: 17.0,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.black
+                      ),
+                    ),
+                //insert interests
+
+                dog.activities == null || dog.activities!.isEmpty
+                  ? const Center(child: CircularProgressIndicator())
+                  : Wrap(
+                      spacing: 10, // Horizontal space between boxes
+                      runSpacing: 10, // Vertical space between boxes
+                      children: dog.activities!.map((activityName) {
+                        return Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(5.0),
+                            gradient: LinearGradient(colors: [
+                              Colors.blueGrey,
+                              Colors.black,
+                            ]),
+                          ),
+                          padding: const EdgeInsets.symmetric(vertical: 7, horizontal: 15),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min, // Make the width adjust based on text length
+                            children: [
+                              Text(
+                                activityName, // Display the activity name
+                                style: const TextStyle(
+                                  fontSize: 15.0,
+                                  fontFamily: 'Roboto',
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+
+
                 SizedBox(height: 10,),
                 Text('Vaccination Status', 
                 style:TextStyle(
@@ -240,7 +303,7 @@ class DogsScreen extends StatelessWidget {
                           Colors.black,
                         ])),
                       child:Text(
-                      dog.isVaccinated ? 'Complete' : 'Incomplete',
+                      dog.isVaccinated ? 'Vaccinated' : 'Incomplete',
                       style:TextStyle(
                       fontSize: 15.0,
                       fontFamily: 'Roboto',
@@ -251,15 +314,47 @@ class DogsScreen extends StatelessWidget {
                 SizedBox(
                   height: 15,
                 ),
-                Text('Medical Info', 
+
+                SizedBox(height: 10,),
+                Text('Vaccinated for:', 
                 style:TextStyle(
-                      fontSize: 15.0,
+                      fontSize: 17.0,
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.bold, 
                       color: Colors.black
                       ),
                     ),
-                    //medID field is removed, but commented for now
+                    dog.vaccines.isEmpty
+                    ? const Center(child: CircularProgressIndicator())
+                    : Column(
+                      children: List.generate(
+                        dog.vaccines.length,
+                        (index) => Row(
+                          children: [
+                            Icon(
+                              Icons.check_circle,
+                              color: Colors.green, // Check icon color
+                              size: 20,
+                            ),
+                            const SizedBox(width: 10),
+                            Text(
+                              dog.vaccines[index]['name'], // Assuming the vaccine name is stored under 'name'
+                              style: const TextStyle(fontSize: 16),
+                            ),                            
+                          ],
+                        ),
+                      ),
+                    ),  
+                    
+                //medID field is removed, but commented for now
+                // Text('Medical Info', 
+                // style:TextStyle(
+                //       fontSize: 15.0,
+                //       fontFamily: 'Roboto',
+                //       fontWeight: FontWeight.bold, 
+                //       color: Colors.black
+                //       ),
+                //     ),                    
                 // Text('Med ID: ${dog.medID}', 
                 // style:TextStyle(
                 //       fontSize: 15.0,
@@ -268,6 +363,7 @@ class DogsScreen extends StatelessWidget {
                 //       color: Colors.black
                 //       ),
                 //     ),
+
                 //Block button starts here
                 Center(
                 child: ConstrainedBox(
@@ -363,7 +459,7 @@ class DogsScreen extends StatelessWidget {
                             );
                           },
                         );
-
+                  
                         // if (confirm == true) {
                         //   // Perform the block action
                         //   String currentUserId = DatabaseRepository().loggedInOwner;
