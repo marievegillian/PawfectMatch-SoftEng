@@ -48,21 +48,6 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
   String? selectedVaccine;
   TextEditingController _otherVaccineCtrl = TextEditingController();
   bool showOtherVaccineField = false;
-  
-  // Declare boolean variables for each vaccine
-  // bool isRabies = false;
-  // // bool isDHPP = false;
-  // bool isParvovirus = false;
-  // bool isHepatitis = false;
-  // bool isDistemper = false;
-  // bool isParainfluenza = false;
-  // bool isLeptospirosis = false;
-  // bool isBordetella = false;
-  // bool isLymeDisease = false;
-  // bool isCanineInfluenza = false;
-  // bool isCoronavirus = false;
-  // bool isCanineHerpesvirus = false;
-
 
    // Fetch dog breeds from the API and flatten the JSON structure
   Future<void> fetchDogBreeds() async {
@@ -434,7 +419,7 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
                       buildVaccineCheckbox('Leptospirosis'),
                       buildVaccineCheckbox('Bordetella (Kennel Cough)'),   
                       buildVaccineCheckbox('Lyme Disease'), 
-                      buildVaccineCheckbox('CanineInfluenza'),  
+                      buildVaccineCheckbox('Canine Influenza'),  
                       buildVaccineCheckbox('Coronavirus'),      
                       buildVaccineCheckbox('Canine Herpes Virus'),                                   
                     ],
