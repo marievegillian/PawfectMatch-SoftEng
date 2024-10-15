@@ -9,7 +9,6 @@ import 'package:pawfectmatch/models/models.dart';
 import 'package:pawfectmatch/resources/reusable_widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:pawfectmatch/screens/dogprofile_screen.dart';
 import 'package:pawfectmatch/screens/screens.dart';
 
 

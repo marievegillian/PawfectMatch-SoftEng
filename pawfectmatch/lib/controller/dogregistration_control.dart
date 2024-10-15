@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:pawfectmatch/models/models.dart';
 import 'package:pawfectmatch/resources/reusable_widgets.dart';
 import 'package:pawfectmatch/screens/home_screen.dart';
+import 'package:pawfectmatch/screens/interestselection_screen.dart';
 
 class DogRegistrationControl {
   late DocumentReference<Map<String, dynamic>> dogRef;
@@ -30,37 +31,35 @@ class DogRegistrationControl {
       String uid,
       String name,
       String bio,
-      Gender? gender,
+      bool gender,
       String breed,
-      DateTime selectedDate,
-      // String medID,
-      Vaccinated? vaxstatus,
+      String birthday,
+      // String medID, //removed field
+      String? purpose,
+      List <String>? activities,
+      bool isVax,
       List<Map<String,dynamic>> selectedVaccines,
       Uint8List? image,
       BuildContext context) async {
-    bool isMale = true;
-    (gender == Gender.male) ? isMale = true : isMale = false;
-
-    bool isVax = true;
-    (vaxstatus == Vaccinated.isVaccinated) ? isVax = true : isVax = false;
-
-    String formattedDate = formatter.format(selectedDate);
 
     // Create a Dog instance
     Dog newDog = Dog(
       bio: bio,
-      birthday: formattedDate,
+      birthday: birthday,
       breed: breed,
-      isMale: isMale,
+      isMale: gender,
       isVaccinated: isVax,
       vaccines: selectedVaccines,
       // medID: medID, //medID field is removed, but commented for now
+      purpose: purpose,
+      activities: activities,
       name: name,
       owner: uid,
       profilePicture: '',
       avgRating: 0,
     );
 
+    //------------------trash code-----------------------------
     // dogRef = await FirebaseFirestore.instance.collection('dogs').add({
     //   'name': name,
     //   'bio': bio,
@@ -73,6 +72,8 @@ class DogRegistrationControl {
     //   'owner': uid,
     // });
     // Add the dog to the 'dogs' collection
+    //------------------------------------------------------
+
     dogRef = await FirebaseFirestore.instance
         .collection('dogs')
         .add(newDog.toJson());

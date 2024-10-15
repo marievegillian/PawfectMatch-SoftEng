@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:pawfectmatch/controller/dogregistration_control.dart';
+import 'package:pawfectmatch/models/dog_model.dart';
 import 'package:pawfectmatch/resources/reusable_widgets.dart';
+import 'package:pawfectmatch/screens/interestselection_screen.dart';
 
 class DogRegistrationScreen extends StatefulWidget {
   const DogRegistrationScreen({super.key});
@@ -370,179 +372,6 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
                 //     _medTxtCtrl, TextInputType.text),
 
                 const SizedBox(height: 20),
-
-                // const Text("Vaccination Status",
-                //     textAlign: TextAlign.left,
-                //     style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                //   children: [
-                //     // Radio button for Male
-                //     Radio(
-                //       value: Vaccinated.isVaccinated,
-                //       groupValue: selectedVaxStatus,
-                //       onChanged: (value) {
-                //         setState(() {
-                //           selectedVaxStatus = value as Vaccinated;
-                //         });
-                //       },
-                //     ),
-                //     const Text("Vaccinated",
-                //         textAlign: TextAlign.left,
-                //         style:
-                //             TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-
-                //     // Add some spacing between radio buttons
-                //     const SizedBox(width: 20),
-
-                //     // Radio button for Female
-                //     Radio(
-                //       value: Vaccinated.isNotVaccinated,
-                //       groupValue: selectedVaxStatus,
-                //       onChanged: (value) {
-                //         setState(() {
-                //           selectedVaxStatus = value as Vaccinated;
-                //         });
-                //       },
-                //     ),
-                //     const Text("Not Vaccinated",
-                //         textAlign: TextAlign.left,
-                //         style:
-                //             TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-                //   ],
-                // ),
-
-                // const Text("Vaccination Status",
-                //     textAlign: TextAlign.left,
-                //     style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-                //   Row(
-                //     mainAxisAlignment: MainAxisAlignment.spaceAround,
-                //     children: [
-                //       // Radio button for Vaccinated
-                //       Radio(
-                //         value: Vaccinated.isVaccinated,
-                //         groupValue: selectedVaxStatus,
-                //         onChanged: (value) {
-                //           setState(() {
-                //             selectedVaxStatus = value as Vaccinated;
-                //           });
-                //         },
-                //       ),
-                //       const Text("Vaccinated",
-                //           textAlign: TextAlign.left,
-                //           style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-
-                //       const SizedBox(width: 20),
-
-                //       // Radio button for Not Vaccinated
-                //       Radio(
-                //         value: Vaccinated.isNotVaccinated,
-                //         groupValue: selectedVaxStatus,
-                //         onChanged: (value) {
-                //           setState(() {
-                //             selectedVaxStatus = value as Vaccinated;
-                //           });
-                //         },
-                //       ),
-                //       const Text("Not Vaccinated",
-                //           textAlign: TextAlign.left,
-                //           style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-                //     ],
-                //   ),
-
-                //   // Vaccination type details (shown only if vaccinated is selected)
-                //   Visibility(
-                //     visible: selectedVaxStatus == Vaccinated.isVaccinated,
-                //     child: Column( // Wrap all widgets in a Column
-                //       crossAxisAlignment: CrossAxisAlignment.start,
-                //       children: [
-                //         const Text("DHPP Components",
-                //             style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-                //         CheckboxListTile(
-                //           title: const Text("Distemper"),
-                //           value: isDistemper,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               isDistemper = value!;
-                //             });
-                //           },
-                //         ),
-                //         CheckboxListTile(
-                //           title: const Text("Hepatitis (Adenovirus)"),
-                //           value: isHepatitis,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               isHepatitis = value!;
-                //             });
-                //           },
-                //         ),
-                //         CheckboxListTile(
-                //           title: const Text("Parainfluenza"),
-                //           value: isParainfluenza,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               isParainfluenza = value!;
-                //             });
-                //           },
-                //         ),
-                //         CheckboxListTile(
-                //           title: const Text("Parvovirus"),
-                //           value: isParvovirus,
-                //           onChanged: (bool? value) {
-                //             setState(() {
-                //               isParvovirus = value!;
-                //             });
-                //           },
-                //         ),
-
-                //         // Additional vaccines dropdown
-                //         const SizedBox(height: 16),
-                //         DropdownButtonFormField<String>(
-                //           decoration: InputDecoration(
-                //             labelText: "Select additional vaccine",
-                //             border: OutlineInputBorder(),
-                //           ),
-                //           items: dogVaccines.map((String vaccine) {
-                //             return DropdownMenuItem<String>(
-                //               value: vaccine,
-                //               child: Text(vaccine),
-                //             );
-                //           }).toList(),
-                //           onChanged: (String? newValue) {
-                //             setState(() {
-                //               selectedVaccine = newValue!;
-                //               showOtherVaccineField = newValue == "Other";
-                //             });
-                //           },
-                //         ),
-
-                //         // Conditionally show the "Other" vaccine input field
-                //         Visibility(
-                //           visible: showOtherVaccineField,
-                //           child: Column(
-                //             crossAxisAlignment: CrossAxisAlignment.start,
-                //             children: [
-                //               const SizedBox(height: 16),
-                //               const Text("Other Vaccine",
-                //                   style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-                //               TextField(
-                //                 controller: _otherVaccineCtrl,
-                //                 decoration: InputDecoration(
-                //                   hintText: "Enter the vaccine name",
-                //                   filled: true,
-                //                   fillColor: Colors.white.withOpacity(0.3),
-                //                   border: OutlineInputBorder(
-                //                     borderRadius: BorderRadius.circular(5),
-                //                     borderSide: const BorderSide(width: 0, style: BorderStyle.solid),
-                //                   ),
-                //                 ),
-                //               ),
-                //             ],
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   ),
             
                 const Text("Vaccination Status",
                   textAlign: TextAlign.left,
@@ -616,21 +445,8 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
                   height: 40,
                 ),
 
-                loginRegisterButton(context, false, () {
-                  _dogRegistrationControl.addToDatabase(
-                      uid,
-                      _nameTxtCtrl.text,
-                      _bioTxtCtrl.text,
-                      selectedGender,
-                      _breedTxtCtrl.text,
-                      selectedDate,
-                      // _medTxtCtrl.text,
-                      selectedVaxStatus,
-                      selectedVaccines,
-                      image,
-                      context);
-
-                      // should also add vaccineinfocontrol.addToDatabase
+                loginRegisterButton(context, false, () {                  
+                  tempSaveDogData();
                 })
               ],
             ),
@@ -639,6 +455,47 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
       ),
     );
   }
+
+void tempSaveDogData(){
+  bool isMale = true;
+  Gender? gender = selectedGender;
+  Vaccinated? vaxstatus = selectedVaxStatus;
+  String  purpose = '';
+  List <String> activities = [];
+
+  (gender == Gender.male) ? isMale = true : isMale = false;
+
+  bool isVax = true;
+  (vaxstatus == Vaccinated.isVaccinated) ? isVax = true : isVax = false;
+
+  String formattedDate = formatter.format(selectedDate);
+  String base64Image = image == null ? '' : base64Encode(image!);
+
+
+  // Create a Dog instance
+  Dog newDog = Dog(
+    bio: _bioTxtCtrl.text,
+    birthday: formattedDate,
+    breed: _breedTxtCtrl.text,
+    isMale: isMale,
+    isVaccinated: isVax,
+    vaccines: selectedVaccines,
+    // medID: medID, //medID field is removed, but commented for now
+    purpose: purpose,
+    activities: activities,
+    name: _nameTxtCtrl.text,
+    owner: uid,
+    profilePicture: base64Image,
+    avgRating: 0,
+  );
+  
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (context) => InterestSelectionScreen(newDog: newDog),
+  ),
+  );
+}
 
 Widget buildVaccineCheckbox(String vaccineName) {
   return CheckboxListTile(
