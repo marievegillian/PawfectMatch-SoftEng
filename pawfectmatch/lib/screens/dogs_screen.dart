@@ -259,14 +259,15 @@ class DogsScreen extends StatelessWidget {
                       color: Colors.black
                       ),
                     ),
-                Text('Med ID: ${dog.medID}', 
-                style:TextStyle(
-                      fontSize: 15.0,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.normal, 
-                      color: Colors.black
-                      ),
-                    ),
+                    //medID field is removed, but commented for now
+                // Text('Med ID: ${dog.medID}', 
+                // style:TextStyle(
+                //       fontSize: 15.0,
+                //       fontFamily: 'Roboto',
+                //       fontWeight: FontWeight.normal, 
+                //       color: Colors.black
+                //       ),
+                //     ),
                 //Block button starts here
                 Center(
                 child: ConstrainedBox(

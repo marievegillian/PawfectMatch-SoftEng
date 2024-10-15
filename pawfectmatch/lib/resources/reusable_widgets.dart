@@ -155,7 +155,7 @@ Container loginRegisterButton(
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)))),
       child: Text(
-        isLogin ? "Log-in" : "Register",
+        isLogin ? "Log-in" : "Next",
         style: const TextStyle(
             color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16),
       ),

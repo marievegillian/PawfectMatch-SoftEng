@@ -93,7 +93,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
       breed = dog.breed;
       isMale = dog.isMale;
       isVaccinated = dog.isVaccinated;
-      medID = dog.medID;
+      // medID = dog.medID;
 
       // Update the UI with the contact number
       setState(() {});
@@ -123,7 +123,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
     String newBio,
     String newBreed,
     String newBirthday,
-    String newMedID,
+    // String newMedID, //medID field is removed, but commented for now
     Vaccinated? newVaxStatus,
   ) async {
     bool isVax;
@@ -134,7 +134,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
         newBio.isEmpty &&
         newBreed.isEmpty &&
         newBirthday.isEmpty &&
-        newMedID.isEmpty &&
+        // newMedID.isEmpty && //medID field is removed, but commented for now
         newVaxStatus == selectedVaxStatus) {
       // No changes, simply close the dialog
       Navigator.pop(context);
@@ -165,11 +165,13 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
     } else {
       updatedFields['birthday'] = birthday;
     }
-    if (newMedID.isNotEmpty) {
-      updatedFields['medID'] = newMedID;
-    } else {
-      updatedFields['medID'] = medID;
-    }
+    //medID field is removed, but commented for now
+    // if (newMedID.isNotEmpty) {
+    //   updatedFields['medID'] = newMedID;
+    // } 
+    // else {
+    //   updatedFields['medID'] = medID;
+    // }
 
     // Update the Firestore document with the new values
     await FirebaseFirestore.instance
@@ -207,7 +209,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
     final TextEditingController _nameTxtCtrl = TextEditingController();
     final TextEditingController _bioTxtCtrl = TextEditingController();
     final TextEditingController _breedTxtCtrl = TextEditingController();
-    final TextEditingController _medTxtCtrl = TextEditingController();
+    // final TextEditingController _medTxtCtrl = TextEditingController();
 
     selectedVaxStatus =
         isVaccinated ? Vaccinated.isVaccinated : Vaccinated.isNotVaccinated;
@@ -349,14 +351,15 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                                   ),
                                 )),
                             const SizedBox(height: 20),
-                            const Text("Medical ID",
-                                textAlign: TextAlign.left,
-                                style: TextStyle(
-                                    fontSize: 18, color: Color(0xff011F3F))),
-                            reusableInputTextField(
-                                "Enter your dog's Medical ID",
-                                _medTxtCtrl,
-                                TextInputType.text),
+                            //medID field is removed, but commented for now
+                            // const Text("Medical ID",
+                            //     textAlign: TextAlign.left,
+                            //     style: TextStyle(
+                            //         fontSize: 18, color: Color(0xff011F3F))),
+                            // reusableInputTextField(
+                            //     "Enter your dog's Medical ID",
+                            //     _medTxtCtrl,
+                            //     TextInputType.text), 
                             const SizedBox(height: 20),
                             const Text("Vaccination Status",
                                 textAlign: TextAlign.left,
@@ -415,7 +418,7 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
                                 _bioTxtCtrl.text,
                                 _breedTxtCtrl.text,
                                 formatter.format(selectedDate),
-                                _medTxtCtrl.text,
+                                // _medTxtCtrl.text, //medID field is removed, but commented for now
                                 selectedVaxStatus);
                           },
                           style: ButtonStyle(
