@@ -1,7 +1,11 @@
   import 'package:cloud_firestore/cloud_firestore.dart';
   import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
   import 'package:geolocator/geolocator.dart';
+import 'package:pawfectmatch/blocs/active_dog/active_dog_cubit.dart';
   import 'package:pawfectmatch/firebase_service.dart';
+import 'package:pawfectmatch/services/locator.dart';
   import '/models/models.dart';
   import '/models/match_model.dart'; 
   import 'repositories.dart';
@@ -61,7 +65,8 @@
 
       // Use the Users.fromJson method to create an instance of Users from the JSON data
       Users user = Users.fromJson(userSnapshot.data() as Map<String, dynamic>);
-      loggedInDogUid = user.dogId;
+     
+      loggedInDogUid = user.activeDogId;
 
       // Get the dog using the updated getDog method and print its name
       await getDog(loggedInDogUid).first.then((dog) {
@@ -75,12 +80,11 @@
     }
   }
 
-
-  Future<void> updateLikedDogsInFirestore(String likedDogOwnerId) async {
-    try {
-      String loggedInUserId = loggedInDogUid;
-      print('Liked Dogs Owner: $likedDogOwnerId');
-      await FirebaseService().updateLikedDogs(loggedInUserId, [likedDogOwnerId]);
+  Future<void> updateLikedDogsInFirestore(String likedDogId) async {
+    try {      
+      String loggedInDog = loggedInDogUid;
+      print('Liked Dog Id: $likedDogId');
+      await FirebaseService().updateLikedDogs(loggedInDog, [likedDogId]);
       
     } catch (e) {
       print('Error updating liked dogs in Firestore: $e');
@@ -99,26 +103,25 @@
     }
   }
     
-  Future<bool> isDogLiked(String dogOwnerId, String likedDogOwnerId) async { //PROBLEMATIC
+  Future<bool> isDogLiked(String dogId, String likedDogId) async { 
     try {
-      //the ID of the DOG of the liked owner
-       String? dog1 = await getOwnedDogID(likedDogOwnerId); 
+      String likedDog = likedDogId;
 
-      if (dog1.isNotEmpty) {
+      if (likedDog.isNotEmpty) {
         CollectionReference<Map<String, dynamic>> likedDogsCollection =
-            _firebaseFirestore.collection('dogs').doc(dog1).collection('likedDogs');
+            _firebaseFirestore.collection('dogs').doc(likedDog).collection('likedDogs');
 
-        print('Checking if $dogOwnerId is liked by $dog1');
+        print('Checking if $dogId is liked by $likedDog');
 
         // Check if the document exists in 'likedDogs' subcollection
-        bool isLiked = (await likedDogsCollection.doc(dogOwnerId).get()).exists;
+        bool isLiked = (await likedDogsCollection.doc(dogId).get()).exists;
 
         print('Result: $isLiked');
 
         return isLiked;
       } else {
         // Handle the case where dog1 is null or empty
-        print('DogOwned is null or empty for ownerId: $dogOwnerId');
+        print('DogOwned is null or empty for ownerId: $dogId');
         return false;
       }
     } catch (error) {
@@ -127,7 +130,7 @@
     }
   }
 
-  Future<String> getOwnedDogID(String ownerId) async {
+  Future<String> getOwnedDogID(String ownerId) async { //TO BE CHECKED
     try {
       // Get a reference to the 'user' document
       DocumentSnapshot<Map<String, dynamic>> userSnapshot =
@@ -264,7 +267,7 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
 
 
 
-  Future<bool> checkMatch(String likedDogOwnerId) async {
+  Future<bool> checkMatch(String likedDogId) async {
     try {
       // Get the current user's dog ID
       setLoggedInOwner();
@@ -272,7 +275,7 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
 
       // Check if the liked dog has liked the current user's dog
       // bool isMatch = await isDogLiked(likedDogOwnerId, loggedInOwner) && await isDogLiked(loggedInOwner, likedDogOwnerId); //orig implementation(bug?)
-      bool isMatch = await isDogLiked(loggedInOwner, likedDogOwnerId);
+      bool isMatch = await isDogLiked(loggedInDogUid, likedDogId);
 
       return isMatch;
     } catch (error) {
@@ -332,36 +335,36 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
     }
   }
 
-  Future<void> updateMatched(String likedDogOwnerId) async {
+  Future<void> updateMatched(String likedDogId) async {
     try {
       // Get the current user's dog ID
       setLoggedInOwner();
       setLoggedInDog();
 
       // Get the dog owned by the liked dog owner
-      String matchedDogOwnerId = likedDogOwnerId;
+      String matchedDogId = likedDogId;
 
-      if (matchedDogOwnerId.isNotEmpty) {
+      if (matchedDogId.isNotEmpty) {
         // Check if the match already exists
-        bool matchExists = await checkMatchExists(loggedInOwner, likedDogOwnerId);
+        bool matchExists = await checkMatchExists(loggedInDogUid, likedDogId);
 
         if (!matchExists) {
           // Update 'matches' collection for user1 (logged-in owner)
           await _firebaseFirestore.collection('matches').add({
-            'user1': loggedInOwner,
-            'user2': likedDogOwnerId,
+            'user1': loggedInDogUid,
+            'user2': likedDogId,
           });
 
           // Update 'matches' collection for user2 (liked dog owner)
           await _firebaseFirestore.collection('matches').add({
-            'user1': likedDogOwnerId,
-            'user2': loggedInOwner,
+            'user1': likedDogId,
+            'user2': loggedInDogUid,
           });
         } else {
-          print('Match already exists between $loggedInOwner and $likedDogOwnerId');
+          print('Match already exists between $loggedInDogUid and $likedDogId');
         }
       } else {
-        print('Matched dog not found for ownerId: $likedDogOwnerId');
+        print('Matched dog not found for ownerId: $likedDogId');
       }
     } catch (error) {
       print('Error updating matched info in Firestore: $error');
@@ -422,7 +425,7 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
         await conversationRef.set({
           'user1': user1Id,
           'user2': user2Id,
-          'lastMessage': initialMessageId,
+          'lastMessage': '', //see how this works, whether it suddenly sends like a blank chat bubble or what
           // Add any other details you want to store about the conversation
         });
 
@@ -450,6 +453,7 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
       print('Error updating dog location: $e');
     }
   }
+   
 
   Future<GeoPoint?> getLoggedInDogLocation() async {
   try {

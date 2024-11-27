@@ -31,13 +31,12 @@ class _ChatScreenState extends State<ChatScreen> {
 
   Future<void> fetchUserData(otheruid) async {
     try {
-      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-          .collection('users')
+      DocumentSnapshot dogSnapshot = await FirebaseFirestore.instance
+          .collection('dogs')
           .doc(otheruid)
           .get();
 
-      // Extract the data from the document snapshot
-      otherusername = userSnapshot['username'];
+      otherusername = dogSnapshot['name'];
 
       setState(() {});
     } catch (e) {
@@ -54,18 +53,17 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  Future<void> fetchDogData(String ownerUid) async {
-    try {
-      QuerySnapshot dogSnapshot = await FirebaseFirestore.instance
-          .collection('dogs')
-          .where('owner', isEqualTo: ownerUid)
-          .get();
+  Future<void> fetchDogData(String dogId) async {
+    try {      
+      DocumentSnapshot dogSnapshot = await FirebaseFirestore.instance
+        .collection('dogs')
+        .doc(dogId)
+        .get();    
+      
+        dogName = dogSnapshot['name'];
 
-      if (dogSnapshot.docs.isNotEmpty) {
-        DocumentSnapshot dogData = dogSnapshot.docs.first;
-        dogName = dogData['name'];
         setState(() {});
-      }
+      
     } catch (e) {
       print('Error fetching dog data: $e');
     }

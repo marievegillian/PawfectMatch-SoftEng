@@ -45,7 +45,7 @@ class _MatchingScreenState extends State<MatchingScreen> {
                         onDoubleTap: () {
                           Navigator.pushNamed(
                             context,
-                            '/dogs',
+                            '/dogs', //suspicious
                             arguments: state.dogs[0],
                           );
                         },

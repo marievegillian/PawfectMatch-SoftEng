@@ -25,12 +25,12 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         currentIndex: myIndex,
         type: BottomNavigationBarType.fixed,
-        items: const [
+        items: const [          
           BottomNavigationBarItem(icon: Icon(Icons.home_rounded), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chats'),
-          BottomNavigationBarItem(icon: Icon(Icons.api_rounded), label: 'PromptBot'),
           BottomNavigationBarItem(icon: Icon(Icons.map), label: 'Map'), // Map icon added
           BottomNavigationBarItem(icon: Icon(Icons.account_circle), label: 'Profile'),
+          // BottomNavigationBarItem(icon: Icon(Icons.telegram), label: 'DOG REG TEST'),
         ],
       ),
     );
@@ -43,11 +43,11 @@ class _HomeScreenState extends State<HomeScreen> {
       case 1:
         return const ChatListScreen(); 
       case 2:
-          return PromptBotScreen();
-      case 3:
         return MapScreen(); // Add MapScreen
-      case 4:
+      case 3:
         return const UserProfileScreen(); 
+      // case 5:
+      //   // return const DogRegistrationScreen(); 
       default:
         return Container(); 
     }

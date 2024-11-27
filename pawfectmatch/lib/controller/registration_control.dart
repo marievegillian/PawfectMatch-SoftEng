@@ -173,7 +173,8 @@ class RegistrationControl {
       'password': password,
       'contactnumber': contactnumber,
       'profilepicture': '',
-      'dog': '',
+      'ownedDogs': '',
+      'activeDogId': '',
     });
   }
 
