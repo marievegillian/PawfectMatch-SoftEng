@@ -89,17 +89,11 @@ import 'package:pawfectmatch/screens/screens.dart';
 //   }
 // }
 
-Future<Map<String, String>> fetchOtherDogData(String otherUserId) async {
+Future<Map<String, String>> fetchOtherDogData(String otherDogId) async {
   try {
-    DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(otherUserId)
-        .get();
-    String otherdoguid = userSnapshot['dog'];
-
     DocumentSnapshot dogSnapshot = await FirebaseFirestore.instance
         .collection('dogs')
-        .doc(otherdoguid)
+        .doc(otherDogId)
         .get();
 
     String dogName = dogSnapshot['name'];
@@ -245,15 +239,15 @@ Future<void> createConversation(String user1Id, String user2Id) async {
   }
 }
 
-Stream<List<Map<String, dynamic>>> getConversationsStream(String loggedUserId,
+Stream<List<Map<String, dynamic>>> getConversationsStream(String loggedDogId,
     StreamController<List<Map<String, dynamic>>> controller) {
   try {
     // Create a function to add conversations to the stream
     void addConversationsToStream() async {
       List<Map<String, dynamic>> conversations1 =
-          await getConversationsForUser(loggedUserId, 'user1');
+          await getConversationsForUser(loggedDogId, 'user1');
       List<Map<String, dynamic>> conversations2 =
-          await getConversationsForUser(loggedUserId, 'user2');
+          await getConversationsForUser(loggedDogId, 'user2');
 
       // Combine the results from both queries
       List<Map<String, dynamic>> conversations = [
@@ -268,14 +262,14 @@ Stream<List<Map<String, dynamic>>> getConversationsStream(String loggedUserId,
     // Listen to snapshots for user1
     FirebaseFirestore.instance
         .collection('conversations')
-        .where('user1', isEqualTo: loggedUserId)
+        .where('user1', isEqualTo: loggedDogId)
         .snapshots()
         .listen((_) => addConversationsToStream());
 
     // Listen to snapshots for user2
     FirebaseFirestore.instance
         .collection('conversations')
-        .where('user2', isEqualTo: loggedUserId)
+        .where('user2', isEqualTo: loggedDogId)
         .snapshots()
         .listen((_) => addConversationsToStream());
   } catch (error) {
@@ -287,11 +281,11 @@ Stream<List<Map<String, dynamic>>> getConversationsStream(String loggedUserId,
 }
 
 Future<List<Map<String, dynamic>>> getConversationsForUser(
-    String userId, String field) async {
+    String dogId, String field) async {
   // Query conversations based on the specified field (user1 or user2)
   QuerySnapshot querySnapshot = await FirebaseFirestore.instance
       .collection('conversations')
-      .where(field, isEqualTo: userId)
+      .where(field, isEqualTo: dogId)
       .get();
 
   return await Future.wait(querySnapshot.docs.map((doc) async {

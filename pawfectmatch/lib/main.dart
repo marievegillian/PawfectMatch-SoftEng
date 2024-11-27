@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pawfectmatch/blocs/active_dog/active_dog_cubit.dart';
 import 'package:pawfectmatch/blocs/bloc.dart';
 import 'package:pawfectmatch/screens/screens.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:pawfectmatch/services/locator.dart';
 import 'firebase_options.dart';
 //import 'models/models.dart';
 import 'repositories/database_repository.dart';
@@ -12,7 +14,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
+  setupLocator();
   runApp(const MyApp());
 }
 
@@ -35,6 +37,9 @@ class MyApp extends StatelessWidget {
               databaseRepository: context.read<DatabaseRepository>(),
             ),
           ),
+          BlocProvider(
+          create: (_) => ActiveDogCubit(),
+        ),
         ],
         child: MaterialApp(
           title: 'Flutter Demo',

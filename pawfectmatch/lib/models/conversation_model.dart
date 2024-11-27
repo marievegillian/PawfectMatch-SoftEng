@@ -3,14 +3,14 @@ import 'package:pawfectmatch/models/models.dart';
 
 class Conversation {
   String lastMessageId;
-  String user1Id;
-  String user2Id;
+  String dog1Id;
+  String dog2Id;
   List<Message> messages;
 
   Conversation({
     required this.lastMessageId,
-    required this.user1Id,
-    required this.user2Id,
+    required this.dog1Id,
+    required this.dog2Id,
     required this.messages,
   });
 
@@ -22,8 +22,8 @@ class Conversation {
 
     return Conversation(
       lastMessageId: json['lastMessageId'] ?? '',
-      user1Id: json['user1Id'] ?? '',
-      user2Id: json['user2Id'] ?? '',
+      dog1Id: json['dog1Id'] ?? '',
+      dog2Id: json['dog2Id'] ?? '',
       messages: parsedMessages,
     );
   }

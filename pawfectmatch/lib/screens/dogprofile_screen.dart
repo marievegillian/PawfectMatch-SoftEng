@@ -93,7 +93,9 @@ class _DogProfileScreenState extends State<DogProfileScreen> {
 
       // Use the Users.fromJson method to create an instance of Users from the JSON data
       Users user = Users.fromJson(userSnapshot.data() as Map<String, dynamic>);
-      doguid = user.dogId;
+       
+      doguid = user.activeDogId; //currently logged in dog
+
       fetchDogData();
     } catch (e) {
       print('Error fetching user data: $e');

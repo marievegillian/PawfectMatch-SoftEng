@@ -1,6 +1,7 @@
 class Users {
   final String contactNumber;
-  final String dogId;
+  List<String> ownedDogs;
+  String activeDogId;
   final String email;
   final String firstName;
   final String lastName;
@@ -11,8 +12,9 @@ class Users {
   List<String> blockedUsers;
 
   Users({
-    required this.contactNumber,
-    required this.dogId,
+    required this.contactNumber,    
+    required this.ownedDogs,
+    required this.activeDogId,
     required this.email,
     required this.firstName,
     required this.lastName,
@@ -25,8 +27,9 @@ class Users {
 
   factory Users.fromJson(Map<String, dynamic> json) {
     return Users(
-      contactNumber: json['contactnumber'] ?? '',
-      dogId: json['dog'] ?? '',
+      contactNumber: json['contactnumber'] ?? '',      
+      ownedDogs: List<String>.from(json['ownedDogs'] ?? []),
+      activeDogId: json['activeDogId'] ?? '',
       email: json['email'] ?? '',
       firstName: json['firstname'] ?? '',
       lastName: json['lastname'] ?? '',
@@ -62,8 +65,9 @@ class Users {
   // Convert the user data to a JSON format
   Map<String, dynamic> toJson() {
     return {
-      'contactnumber': contactNumber,
-      'dog': dogId,
+      'contactnumber': contactNumber,      
+      'ownedDogs': ownedDogs,
+      'activeDogId': activeDogId,
       'email': email,
       'firstname': firstName,
       'lastname': lastName,

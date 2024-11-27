@@ -108,17 +108,18 @@ void _onSwipeRight(
       emit(SwipeLoaded(dogs: dogs));
 
       // Get the owner ID of the swiped dog
-      String likedDogOwnerId = event.dogs.owner;
+      String likedDogId = event.dogs.dogId;
+      print("The dog id liked was: $likedDogId");
 
       // Update the likedDogs collection in Firestore
-      await _databaseRepository.updateLikedDogsInFirestore(likedDogOwnerId);
+      await _databaseRepository.updateLikedDogsInFirestore(likedDogId); 
 
-      bool isMatch = await _databaseRepository.checkMatch(likedDogOwnerId);
+      bool isMatch = await _databaseRepository.checkMatch(likedDogId);
 
       if (isMatch) {
         // Update the matches collection in Firestore
         print('Updating matches collection...');
-        await _databaseRepository.updateMatched(likedDogOwnerId);
+        await _databaseRepository.updateMatched(likedDogId);
         print('Matches collection updated successfully.');
 
         // Show the matched popup
@@ -127,9 +128,9 @@ void _onSwipeRight(
         print('Matched popup displayed.');
 
         // Create a conversation
-        String loggedInOwner =  _databaseRepository.loggedInOwner;
+        String loggedInDog =  _databaseRepository.loggedInDogUid;
         print('Creating conversation...');
-        await _databaseRepository.createConversation(loggedInOwner, likedDogOwnerId);
+        await _databaseRepository.createConversation(loggedInDog, likedDogId); //change this to the dog currently on
         print('Conversation created successfully.');
       }
     } else {

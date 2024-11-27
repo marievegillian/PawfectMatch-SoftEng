@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:intl/intl.dart';
 
 class Dog {
+  String dogId;
   String bio;
   String birthday;
   String breed;
@@ -21,6 +22,7 @@ class Dog {
   List<String> blockedUsers; 
 
   Dog({
+    required this.dogId,
     required this.bio,
     required this.birthday,
     required this.breed,
@@ -40,14 +42,14 @@ class Dog {
 
   factory Dog.fromJson(Map<String, dynamic> json) {
     return Dog(
+      dogId: json['dogId'] ?? '',
       bio: json['bio'] ?? '',
       birthday: json['birthday'] ?? '',
       breed: json['breed'] ?? '',
       isMale: json['isMale'] ?? false,
       isVaccinated: json['isVaccinated'] ?? false,
-      // medID: json['medID'] ?? '',
       name: json['name'] ?? '',
-      owner: json['owner'] ?? 'Still figuring it out',
+      owner: json['owner'] ?? '',
       profilePicture: json['profilepicture'] ?? '',
       avgRating: (json['avgRating'] ?? 0).toDouble(),
       purpose: json['purpose'] ?? '',
@@ -60,6 +62,7 @@ class Dog {
 
   Map<String, dynamic> toJson() {
     return {
+      'dogId':dogId,
       'bio': bio,
       'birthday': birthday,
       'breed': breed,

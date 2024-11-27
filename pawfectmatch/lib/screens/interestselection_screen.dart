@@ -222,7 +222,7 @@ class _InterestSelectionScreenState extends State<InterestSelectionScreen> {
                             RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)))
                         ),
                       child: Text(
-                        'REGISTER',
+                        'Get Your Pup On!',
                         style: const TextStyle(
                           color: Colors.white, fontWeight: FontWeight.w600, fontSize: 16
                         ),

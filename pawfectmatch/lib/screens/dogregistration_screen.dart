@@ -459,6 +459,7 @@ void tempSaveDogData(){
 
   // Create a Dog instance
   Dog newDog = Dog(
+    dogId: '',
     bio: _bioTxtCtrl.text,
     birthday: formattedDate,
     breed: _breedTxtCtrl.text,

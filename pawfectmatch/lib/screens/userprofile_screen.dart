@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:pawfectmatch/blocs/active_dog/active_dog_cubit.dart';
 import 'package:pawfectmatch/controller/userprofile_control.dart';
 import 'package:pawfectmatch/models/models.dart';
 
@@ -30,7 +32,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
   String dogProfilePictureUrl = '';
   String dogname = '';
   String doguid = '';
+  List<String> ownedDogs = [];
   String pw = '';
+  List<Map<String, String>> dogProfiles = [];
 
   Uint8List? image;
 
@@ -80,10 +84,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       firstname = user.firstName;
       lastname = user.lastName;
       profilePictureUrl = user.profilePicture;
-      doguid = user.dogId;
+      doguid = user.activeDogId;
+      ownedDogs = user.ownedDogs;
       pw = user.password;
 
-      fetchDogData();
+      fetchActiveDogData();
+      fetchOwnedDogs();
 
       // Update the UI with the contact number
       setState(() {});
@@ -92,7 +98,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     }
   }
 
-  Future<void> fetchDogData() async {
+  Future<void> fetchActiveDogData() async {
     try {
       DocumentSnapshot dogSnapshot =
           await FirebaseFirestore.instance.collection('dogs').doc(doguid).get();
@@ -112,6 +118,117 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       // Update the UI with the contact number
     } catch (e) {
       print('Error fetching dog data: $e');
+    }
+  }
+
+  Future<void> fetchOwnedDogs() async {
+    try {
+      // Assuming you have a list of dog ids (ownedDogs)
+      for (String dogId in ownedDogs) {
+        // if (dogId!=doguid) 
+        DocumentSnapshot dogSnapshot = await FirebaseFirestore.instance
+            .collection('dogs')
+            .doc(dogId)
+            .get();
+        
+          // Assuming dog data has the fields `name` and `profilePictureUrl`
+          Map<String, String> dogData = {
+            "dogId":dogSnapshot["dogId"],
+            "name": dogSnapshot["name"],
+            "profilePictureUrl": dogSnapshot["profilepicture"] ?? ''
+          };
+
+          dogProfiles.add(dogData);
+        
+      }
+      setState(() {}); // Update UI after fetching dog profiles
+    } catch (e) {
+      print("Error fetching dog profiles: $e");
+    }
+  }
+
+  final int maxProfiles = 5; // Maximum number of profiles
+
+  void _switchProfile(String? dogId, String dogName) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Switch to $dogName\'s Profile?'),
+          actions: [
+            TextButton(
+              onPressed: () async {
+                Navigator.pop(context); // Close dialog  
+                
+                if (context.mounted) {
+                  context.read<ActiveDogCubit>().setActiveDog(dogId!);
+                }
+
+                await FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(uid)
+                  .update({
+                    'activeDogId': dogId // Add dog ID to the array
+                  });                
+
+                doguid = dogId!;
+
+                fetchActiveDogData(); 
+                if (context.mounted) {
+                Navigator.push(
+                    context, MaterialPageRoute(builder: (context) => const HomeScreen()));      } 
+              },
+              child: Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // Close dialog
+              },
+              child: Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _addNewProfile() {
+    if (dogProfiles.length < maxProfiles) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Add New Dog Profile?'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Add your logic to add a new profile here
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const DogRegistrationScreen(),
+                    ),
+                  );
+                },
+                child: Text('Yes'),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                },
+                child: Text('No'),
+              ),
+            ],
+          );
+        },
+      );
+    } else {
+      // Maximum number of profiles reached
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('You have reached the maximum number of profiles!'),
+        ),
+      );
     }
   }
 
@@ -563,7 +680,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 height: 25,
               ),
               const Text(
-                "Dog:",
+                "Dog currently logged in:",
                 style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.w600,
@@ -575,7 +692,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               GestureDetector(
                 child: FutureBuilder(
                   future:
-                      fetchDogData(), // Use FutureBuilder to handle asynchronous operation
+                      fetchActiveDogData(), // Use FutureBuilder to handle asynchronous operation
                   builder: (context, snapshot) {
                     if (isDogDataLoaded) {
                       // Display dog picture only when data is loaded
@@ -602,7 +719,51 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 dogname.isNotEmpty ? dogname : 'Dog',
                 style:
                     const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
+              ),              
+              const SizedBox(
+                height: 25,
               ),
+              const Text(
+                "Your Dogs:",
+                style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xff545F71)),
+              ),
+
+              // Display dog profile avatars
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    // Display dog profiles
+                    ...List.generate(dogProfiles.length, (index) {
+                      final dogProfile = dogProfiles[index];
+                      return GestureDetector(
+                        onTap: () => _switchProfile(dogProfile["dogId"], dogProfile["name"]!),
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundImage: NetworkImage(dogProfile["profilePictureUrl"]!),
+                        ),
+                      );
+                    }),
+                    // Add the "Add New Profile" button if there are less than 5 profiles
+                    if (dogProfiles.length < maxProfiles)
+                      GestureDetector(
+                        onTap: _addNewProfile,
+                        child: CircleAvatar(
+                          radius: 45,
+                          backgroundColor: const Color.fromARGB(255, 186, 210, 246),
+                          child: const Icon(
+                            Icons.add,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+
               const SizedBox(
                 height: 50,
               ),
