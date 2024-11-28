@@ -99,19 +99,51 @@ Future<Map<String, String>> fetchOtherDogData(String otherDogId) async {
     String dogName = dogSnapshot['name'];
     String dogPhoto = dogSnapshot['profilepicture'];
 
-    return {'name': dogName, 'photo': dogPhoto};
+    String ownerId = dogSnapshot['owner'];
+
+    DocumentSnapshot ownerSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(ownerId)
+        .get();
+
+    String ownerName = ownerSnapshot['username'];
+
+    return {'name': dogName, 'photo': dogPhoto, 'ownername': ownerName};
   } catch (e) {
     print('Error fetching dog data: $e');
     return {'name': '', 'photo': ''}; // Handle the error appropriately
   }
 }
 
-Widget buildConversationItem(Map<String, dynamic> conversation, String uid) {
+Future<Map<String, String>> fetchMyDogData(String activeDogId) async {
+  try {
+    DocumentSnapshot dogSnapshot = await FirebaseFirestore.instance
+        .collection('dogs')
+        .doc(activeDogId)
+        .get();
+
+    String dogName = dogSnapshot['name'];
+    // String dogPhoto = dogSnapshot['profilepicture'];
+
+    return {'name': dogName};
+  } catch (e) {
+    print('Error fetching dog data: $e');
+    return {'name': '', 'photo': ''};
+  }
+}
+
+Widget buildConversationItem(Map<String, dynamic> conversation, String activeDogId) {
   return FutureBuilder(
-    future: fetchOtherDogData(conversation['otherUserId']),
+    // future: fetchOtherDogData(conversation['otherUserId']),
+    future: Future.wait([
+      fetchOtherDogData(conversation['otherUserId']),  // Fetch other dog data
+      fetchMyDogData(activeDogId),  // Fetch your dog data
+    ]),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.done) {
-        Map<String, String> dogData = snapshot.data as Map<String, String>;
+        // Map<String, String> dogData = snapshot.data as Map<String, String>;
+        Map<String, String> otherDogData = snapshot.data![0];
+        Map<String, String> myDogData = snapshot.data![1];
 
         return Container(
           padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
@@ -134,7 +166,7 @@ Widget buildConversationItem(Map<String, dynamic> conversation, String uid) {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(500),
                 child: Image.network(
-                  dogData['photo'] ?? '',
+                  otherDogData['photo'] ?? '',
                   fit: BoxFit.cover,
                 ),
               ),
@@ -143,7 +175,7 @@ Widget buildConversationItem(Map<String, dynamic> conversation, String uid) {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  dogData['name'] ?? '',
+                  otherDogData['name'] ?? '',
                   style: const TextStyle(
                       fontSize: 20, fontWeight: FontWeight.w500),
                 ),
@@ -155,7 +187,7 @@ Widget buildConversationItem(Map<String, dynamic> conversation, String uid) {
                 ),
               ],
             ),
-            subtitle: conversation['lastMessage'] == uid ||
+            subtitle: conversation['lastMessage'] == activeDogId ||
                     conversation['lastMessage'] == conversation['otherUserId']
                 ? const Text(
                     "Start a conversation. Say hello!",
@@ -167,10 +199,12 @@ Widget buildConversationItem(Map<String, dynamic> conversation, String uid) {
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatScreen(
-                    otherDogName: dogData['name'] ?? '',
-                    otherDogPhotoUrl: dogData['photo'] ?? '',
+                    myDogName: myDogData['name'] ?? '',
+                    otherDogName: otherDogData['name'] ?? '',
+                    otherDogPhotoUrl: otherDogData['photo'] ?? '',
+                    otherOwnerName: otherDogData['ownername'] ?? '',
                     convoID: conversation['conversationId'],
-                    otherUser: conversation['otherUserId'],
+                    otherUser: conversation['otherUserId'], //this is the dog id
                   ),
                 ),
               );

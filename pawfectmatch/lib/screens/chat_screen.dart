@@ -5,15 +5,19 @@ import 'package:pawfectmatch/controller/chat_control.dart';
 // import 'package:pawfectmatch/screens/appointment_screen.dart';
 
 class ChatScreen extends StatefulWidget {
+  final String myDogName;
   final String otherDogName;
   final String otherDogPhotoUrl;
+  final String otherOwnerName;
   final String convoID;
   final String otherUser;
 
   const ChatScreen(
       {super.key,
+      required this.myDogName,
       required this.otherDogName,
       required this.otherDogPhotoUrl,
+      required this.otherOwnerName,
       required this.convoID,
       required this.otherUser});
 
@@ -29,55 +33,10 @@ class _ChatScreenState extends State<ChatScreen> {
   late List<Map<String, dynamic>> messages = [];
   late ScrollController _scrollController;
 
-  Future<void> fetchUserData(otheruid) async {
-    try {
-      DocumentSnapshot dogSnapshot = await FirebaseFirestore.instance
-          .collection('dogs')
-          .doc(otheruid)
-          .get();
-
-      otherusername = dogSnapshot['name'];
-
-      setState(() {});
-    } catch (e) {
-      print('Error fetching user data: $e');
-    }
-  }
-
-  Future<void> fetchConversations() async {
-    try {
-      messages = await getMessages(widget.convoID);
-      setState(() {});
-    } catch (error) {
-      print('Error fetching conversations: $error');
-    }
-  }
-
-  Future<void> fetchDogData(String dogId) async {
-    try {      
-      DocumentSnapshot dogSnapshot = await FirebaseFirestore.instance
-        .collection('dogs')
-        .doc(dogId)
-        .get();    
-      
-        dogName = dogSnapshot['name'];
-
-        setState(() {});
-      
-    } catch (e) {
-      print('Error fetching dog data: $e');
-    }
-  }
-
-
-
   @override
   void initState() {
     super.initState();
-    uid = FirebaseAuth.instance.currentUser!.uid;
-    fetchUserData(widget.otherUser);
-    fetchConversations();
-    fetchDogData(uid);
+    uid = FirebaseAuth.instance.currentUser!.uid;    
     _scrollController = ScrollController();
   }
 
@@ -107,7 +66,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                 ),
                 Text(
-                  '$otherusername\'s dog',
+                  '${widget.otherOwnerName}\'s dog',
+                  // widget.ownerName,
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -118,37 +78,6 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ],
         ),
-        // actions: [
-        //   Padding(
-            // padding: const EdgeInsets.symmetric(horizontal: 12),
-            // child: ElevatedButton.icon(
-            //   onPressed: () {
-            //     // Navigate to the appointment screen
-            //     Navigator.push(
-            //       context,
-            //       MaterialPageRoute(builder: (context) => AppointmentScreen()),
-            //     );
-            //   },
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: Colors.white,
-            //     shape: RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.circular(8),
-            //     ),
-            //     padding: const EdgeInsets.all(9),
-            //   ),
-            //   icon: const Icon(
-            //     Icons.calendar_today_rounded,
-            //     color: Color(0xff011F3F),
-            //   ),
-            //   label: const Text(
-            //     'Set Schedule',
-            //     style: TextStyle(
-            //       color: Color(0xff011F3F),
-            //     ),
-            //   ),
-            // ),
-        //   ),
-        // ],
       ),
       body: Column(
         children: [
@@ -183,7 +112,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       uid,
                       widget.otherDogName,
                       widget.otherDogPhotoUrl,
-                      dogName,
+                      widget.myDogName,
                       widget.otherUser,
                     );
                   },
