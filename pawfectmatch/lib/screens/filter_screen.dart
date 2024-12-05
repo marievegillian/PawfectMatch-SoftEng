@@ -31,15 +31,8 @@ class _FilterScreenState extends State<FilterScreen> {
   @override
   void initState() {
     super.initState();
-    clearPreferences();
     _loadFilters();
   }
-
-  Future<void> clearPreferences() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.clear();
-  }
-
 
   Future<void> _loadFilters() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
