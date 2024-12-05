@@ -1,9 +1,12 @@
 import 'package:bloc/bloc.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:pawfectmatch/models/models.dart';
 import 'package:pawfectmatch/repositories/repositories.dart';
+import 'package:pawfectmatch/utils/filter_manager.dart';
 import 'package:pawfectmatch/widgets/matched_popup.dart';
+import 'package:geolocator/geolocator.dart';
 
 part 'swipe_event.dart';
 part 'swipe_state.dart';
@@ -37,24 +40,100 @@ void _onLoadDogs(
     final List<Dog> allDogs = await dogsStream.first;
 
     // Fetch liked dogs
-    final List<String> likedDogsOwners = await _databaseRepository.getLikedDogs();
+    final List<String> likedDogs = await _databaseRepository.getLikedDogs();
 
     // Fetch blocked owners
     final List<String> blockedOwners = await _databaseRepository.getBlockedOwners();
+
+    //get the filtered dogs based on the filter feature
     
     print('All Dogs: ${allDogs.map((dog) => dog.owner).toList()}');
-    print('Liked Dogs Owners: $likedDogsOwners');
+    print('Liked Dogs Owners: $likedDogs');
     print('Blocked Owners: $blockedOwners');
 
     // Filter out liked dogs
     // final List<Dog> filteredDogs =
     //     allDogs.where((dog) => !likedDogsOwners.contains(dog.owner)).toList();
 
-    // Filter out liked dogs and blocked owners
-    final List<Dog> filteredDogs = allDogs.where((dog) =>
-        !likedDogsOwners.contains(dog.owner) &&
-        !blockedOwners.contains(dog.owner)).toList();
+    // Filter out liked dogs and blocked owners //ORIGINAL
+    // final List<Dog> filteredDogs = allDogs.where((dog) =>
+    //     !likedDogs.contains(dog.dogId) &&
+    //     !blockedOwners.contains(dog.owner)).toList();
 
+    // Get filters dynamically
+    final filters = FilterManager().filters;
+    print('Filters: $filters');
+
+    // Max distance for filtering
+    final double? maxDistance = filters['maxDistance']; // Max distance in kilometers
+    final GeoPoint? userLocation = await _databaseRepository.getDogLocation(DatabaseRepository().loggedInOwner); // Fetch user's actual location
+
+    if (userLocation == null) {
+      print('Error: User location is not available');
+      emit(SwipeError());
+      return;
+    }
+
+    // Fetch all dog locations asynchronously
+    Map<String, GeoPoint?> dogLocations = {};
+    for (var dog in allDogs) {
+      dogLocations[dog.owner] = await _databaseRepository.getDogLocation(dog.owner);
+    }
+
+    // Apply filters
+    final List<Dog> filteredDogs = allDogs.where((dog) {
+      int dogAge = 0;
+    //int dogDistance = 0;
+      // print("Dog name: ${dog.name}; Dog location" ${dog.}");
+
+      if(dog.birthday!= ''){
+        dogAge = calculateAge(dog.birthday);
+      }
+
+      if (likedDogs.contains(dog.dogId) || blockedOwners.contains(dog.owner)) {
+        return false;
+      }
+
+      if (filters['gender'] != 'Any' && dog.isMale != (filters['gender'] == 'Male')) {
+        return false;
+      }      
+
+      if (dogAge < filters['ageRange'].start || dogAge > filters['ageRange'].end) {
+        return false;
+      }
+
+      //TEMPORARILY COMMENTED
+      //DO NOT REMOVE!
+      // if (filters['breeds'].isNotEmpty && !filters['breeds'].contains(dog.breed)) {
+      //   return false;
+      // }
+
+      print("im calculating distance here yo");
+
+      // Distance filter
+      if (maxDistance != null) {
+        final GeoPoint? dogLocation = dogLocations[dog.owner];
+        if (dogLocation != null) {
+          double distance = calculateDistance(
+            userLocation.latitude,
+            userLocation.longitude,
+            dogLocation.latitude,
+            dogLocation.longitude,
+          );
+          print("Dog name: ${dog.name}, Dog distance: $distance");
+
+          if (distance > maxDistance) return false;
+          
+        }
+      } else {
+        print("distance is null.....");
+        return true;
+      }
+
+      return true;
+    }).toList();
+
+    
     print('Filtered Dogs: ${filteredDogs.map((dog) => dog.owner).toList()}');
 
     emit(SwipeLoaded(dogs: filteredDogs));
@@ -64,8 +143,30 @@ void _onLoadDogs(
   }
 }
 
+int calculateAge(String birthday) {
+    DateTime now = DateTime.now();    
+    DateTime birthDate = DateTime.parse(birthday);
+    int age = now.year - birthDate.year;
+    if (now.month < birthDate.month || (now.month == birthDate.month && now.day < birthDate.day)) {
+      age--;
+    }
+    return age;
+  }
 
-
+double calculateDistance(
+  double startLatitude,
+  double startLongitude,
+  double endLatitude,
+  double endLongitude,
+) {
+  print("im calculating distance here yo");
+  return Geolocator.distanceBetween(
+    startLatitude,
+    startLongitude,
+    endLatitude,
+    endLongitude,
+  ) / 1000; // Convert meters to kilometers
+}
 
   void _onUpdateHome(
     UpdateHome event,

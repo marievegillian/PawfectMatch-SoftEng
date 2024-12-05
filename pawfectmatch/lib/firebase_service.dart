@@ -39,7 +39,7 @@ class FirebaseService {
   }
 
 
-  Future<void> updateLikedDogs(String dogUid, List<String> likedDogOwnerIds) async {
+  Future<void> updateLikedDogs(String dogUid, List<String> likedDogIds) async {
   try {
     // Get a reference to the 'likedDogs' subcollection for the specified dog
     CollectionReference<Map<String, dynamic>> likedDogsCollection =
@@ -53,7 +53,7 @@ class FirebaseService {
 
     // Combine the existing liked dogs with the new ones and remove duplicates
      List<String> updatedLikedDogs =
-        Set<String>.from([...currentLikedDogs, ...likedDogOwnerIds]).toList();
+        Set<String>.from([...currentLikedDogs, ...likedDogIds]).toList();
 
     // Clear existing documents in the 'likedDogs' subcollection
     await likedDogsCollection.get().then(
@@ -65,8 +65,8 @@ class FirebaseService {
     );
 
     // Add new documents with empty data to represent liked dogs
-    updatedLikedDogs.forEach((likedDogOwnerId) async {
-      await likedDogsCollection.doc(likedDogOwnerId).set({'owner': likedDogOwnerId});
+    updatedLikedDogs.forEach((likedDogId) async {
+      await likedDogsCollection.doc(likedDogId).set({'dogId': likedDogId});
     });
 
     print('Liked dogs updated successfully');

@@ -90,4 +90,11 @@ class Dog {
     }
     return age;
   }
+
+  String fetchGender(){
+    if(!isMale){
+      return 'Female';
+    }
+    return 'Male';
+  }  
 }
