@@ -168,12 +168,12 @@ import 'package:pawfectmatch/services/locator.dart';
       print("got all docs in the likedDogs");
 
       // Extract the 'owner' field from each document
-      List<String> likedDogOwners = likedDogsSnapshot.docs
-          .map((doc) => doc.data()['owner'] as String)
+      List<String> likedDogs = likedDogsSnapshot.docs
+          .map((doc) => doc.data()['dogId'] as String)
           .toList();
       print("owner extracted");
 
-      return likedDogOwners;
+      return likedDogs;
     } catch (error) {
       print('Error getting liked dog owners: $error');
       return [];

@@ -13,7 +13,7 @@ class DogsScreen extends StatelessWidget {
 
   static Route route({required Dog dog}) {
     return MaterialPageRoute(
-      settings: RouteSettings(name: routeName),
+      settings: const RouteSettings(name: routeName),
       builder: (context) => DogsScreen(dog: dog),
     );
   }
@@ -172,6 +172,7 @@ class DogsScreen extends StatelessWidget {
                     }
                   },
                 ),
+                 
                 SizedBox(height: 15,),
                 const Text('Currently looking for...', 
                 style:TextStyle(
@@ -189,6 +190,36 @@ class DogsScreen extends StatelessWidget {
                       color: Colors.black
                       ),
                     ),
+                SizedBox(height: 15,),
+                const Text('Gender', 
+                style:TextStyle(
+                      fontSize: 20.0,
+                      fontFamily: 'Roboto',
+                      fontWeight: FontWeight.bold, 
+                      color: Colors.black
+                      ),
+                    ),
+                Container(
+                  padding: const EdgeInsets.all(5.0),
+                  margin: const EdgeInsets.only(
+                    top:5.0,
+                    right: 5.0,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    gradient: LinearGradient(colors: [
+                      Colors.blueGrey,
+                      Colors.black,
+                    ])),
+                  child:Text('${dog.fetchGender()}',
+                  style:TextStyle(
+                  fontSize: 16.0,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.normal, 
+                  color: Colors.white)
+                      )
+                  ),
+                
                 SizedBox(height: 15,),
                 const Text('Bio', 
                 style:TextStyle(
@@ -213,28 +244,28 @@ class DogsScreen extends StatelessWidget {
                       fontFamily: 'Roboto',
                       fontWeight: FontWeight.bold, 
                       color: Colors.black
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(5.0),
-                      margin: const EdgeInsets.only(
-                        top:5.0,
-                        right: 5.0,
-                      ),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(5.0),
-                        gradient: LinearGradient(colors: [
-                          Colors.blueGrey,
-                          Colors.black,
-                        ])),
-                      child:Text('${dog.breed}',
-                      style:TextStyle(
-                      fontSize: 15.0,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.normal, 
-                      color: Colors.white)
-                          )
-                      ),
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(5.0),
+                  margin: const EdgeInsets.only(
+                    top:5.0,
+                    right: 5.0,
+                  ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5.0),
+                    gradient: LinearGradient(colors: [
+                      Colors.blueGrey,
+                      Colors.black,
+                    ])),
+                  child:Text('${dog.breed}',
+                  style:TextStyle(
+                  fontSize: 15.0,
+                  fontFamily: 'Roboto',
+                  fontWeight: FontWeight.normal, 
+                  color: Colors.white)
+                      )
+                  ),
 
                 SizedBox(height: 10,),
                 Text('Interests', 
