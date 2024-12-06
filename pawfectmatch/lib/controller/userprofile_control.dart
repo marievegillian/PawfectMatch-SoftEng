@@ -43,12 +43,11 @@ void createProfileBoostCheckout(BuildContext context) async {
 }
 
 void _launchCheckoutPage(String checkoutUrl) async {
-  if (await canLaunch(checkoutUrl)) {
-    await launch(
-      checkoutUrl,
-      forceSafariVC: false,
-      forceWebView: false,
-      enableJavaScript: true,
+  final Uri url = Uri.parse(checkoutUrl);
+  if (await canLaunchUrl(url)) {
+    await launchUrl(
+      url,
+      mode: LaunchMode.externalApplication,
     );
   } else {
     throw 'Could not launch $checkoutUrl';
