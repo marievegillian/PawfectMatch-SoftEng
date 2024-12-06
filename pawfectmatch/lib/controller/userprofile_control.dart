@@ -2,10 +2,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pawfectmatch/screens/login_screen.dart';
 import 'package:pawfectmatch/payment/paymongo_service.dart';
+import 'package:pawfectmatch/utils/filter_manager.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 void signUserOut(BuildContext context) {
   FirebaseAuth.instance.signOut();
+  clearPreferences();
+  clearFilters();
   Navigator.push(
     context,
     MaterialPageRoute(
@@ -13,6 +17,21 @@ void signUserOut(BuildContext context) {
     ),
   );
 }
+
+Future<void> clearPreferences() async {
+  SharedPreferences prefs = await SharedPreferences.getInstance();
+  await prefs.clear();
+}
+
+void clearFilters() {
+  FilterManager().filters = {
+    'gender': 'Any',
+    'ageRange': const RangeValues(0, 20),
+    'breeds': [],
+    'maxDistance': null,
+  };
+}
+
 
 void createProfileBoostCheckout(BuildContext context) async {
   final paymentService = PaymentService();
