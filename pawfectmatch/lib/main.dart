@@ -8,12 +8,14 @@ import 'package:pawfectmatch/services/locator.dart';
 import 'firebase_options.dart';
 //import 'models/models.dart';
 import 'repositories/database_repository.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  await dotenv.load(fileName: ".env");
   setupLocator();
   runApp(const MyApp());
 }
@@ -38,14 +40,15 @@ class MyApp extends StatelessWidget {
             ),
           ),
           BlocProvider(
-          create: (_) => ActiveDogCubit(),
-        ),
+            create: (_) => ActiveDogCubit(),
+          ),
         ],
         child: MaterialApp(
           title: 'Flutter Demo',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xff011F3F)),
+            colorScheme:
+                ColorScheme.fromSeed(seedColor: const Color(0xff011F3F)),
             useMaterial3: true,
           ),
           //home: const SplashScreen(),

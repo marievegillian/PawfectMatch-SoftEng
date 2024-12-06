@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pawfectmatch/screens/login_screen.dart';
+import 'package:pawfectmatch/payment/paymongo_service.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void signUserOut(BuildContext context) {
   FirebaseAuth.instance.signOut();
@@ -10,6 +12,47 @@ void signUserOut(BuildContext context) {
       builder: (context) => const LoginScreen(),
     ),
   );
+}
+
+void createProfileBoostCheckout(BuildContext context) async {
+  final paymentService = PaymentService();
+
+  try {
+    final response = await paymentService.createCheckoutSession(
+      description: 'Boost profile for 3 days',
+      lineItems: [
+        {
+          "currency": "PHP",
+          "amount": 5000, // Amount in cents (PHP 70.00)
+          "name": "Boost profile visibility",
+          "quantity": 1,
+          "description": "Boost",
+        },
+      ],
+    );
+
+    print('Checkout Session Created: ${response['data']}');
+    // Redirect user to the checkout session's URL if needed
+    final checkoutUrl = response['data']['attributes']['checkout_url'];
+    if (checkoutUrl != null) {
+      _launchCheckoutPage(checkoutUrl);
+    }
+  } catch (e) {
+    print('Error creating checkout session: $e');
+  }
+}
+
+void _launchCheckoutPage(String checkoutUrl) async {
+  if (await canLaunch(checkoutUrl)) {
+    await launch(
+      checkoutUrl,
+      forceSafariVC: false,
+      forceWebView: false,
+      enableJavaScript: true,
+    );
+  } else {
+    throw 'Could not launch $checkoutUrl';
+  }
 }
 
 Container signOutButton(BuildContext context, Function onTap) {
@@ -36,6 +79,47 @@ Container signOutButton(BuildContext context, Function onTap) {
           children: [
             Text(
               "Sign Out",
+              style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 18),
+            ),
+            SizedBox(
+              width: 7,
+            ),
+            Icon(
+              Icons.logout,
+              color: Colors.white,
+            ),
+          ],
+        )),
+  );
+}
+
+Container boostButton(BuildContext context, Function onTap) {
+  return Container(
+    width: 185,
+    height: 43,
+    margin: const EdgeInsets.fromLTRB(0, 10, 0, 20),
+    child: ElevatedButton(
+        onPressed: () {
+          onTap();
+        },
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.resolveWith((states) {
+              if (states.contains(MaterialState.pressed)) {
+                return const Color(0xffFF2C2C).withOpacity(0.8);
+              }
+              return const Color(0xffFF2C2C);
+            }),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(40)))),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Boost Profile",
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w400,

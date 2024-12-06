@@ -1,77 +1,75 @@
-  import 'package:cloud_firestore/cloud_firestore.dart';
-  import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-  import 'package:geolocator/geolocator.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:pawfectmatch/blocs/active_dog/active_dog_cubit.dart';
-  import 'package:pawfectmatch/firebase_service.dart';
+import 'package:pawfectmatch/firebase_service.dart';
 import 'package:pawfectmatch/services/locator.dart';
-  import '/models/models.dart';
-  import '/models/match_model.dart'; 
-  import 'repositories.dart';
+import '/models/models.dart';
+import '/models/match_model.dart';
+import 'repositories.dart';
 
+class DatabaseRepository extends BaseDatabaseRepository {
+  final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
-  class DatabaseRepository extends BaseDatabaseRepository {
-    final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
+  @override
+  Stream<Dog> getDog(String dogId) {
+    print('Getting dog from DB');
+    return _firebaseFirestore
+        .collection('dogs')
+        .doc(dogId)
+        .snapshots()
+        .map((snap) => Dog.fromJson(snap.data() as Map<String, dynamic>));
+  }
 
-    @override
-    Stream<Dog> getDog(String dogId) {
-      print('Getting dog from DB');
-      return _firebaseFirestore
-          .collection('dogs')
-          .doc(dogId)
-          .snapshots()
-          .map((snap) => Dog.fromJson(snap.data() as Map<String, dynamic>));
-    }
-
-    @override
-    Stream<List<Dog>> getDogs() {
-      try {
-        // Query the "dogs" collection
-        setLoggedInOwner();
-        setLoggedInDog();
-        
-        return _firebaseFirestore
-            .collection('dogs')
-            .snapshots()
-            .map((snap) => snap.docs
-                .map((doc) => Dog.fromJson(doc.data() as Map<String, dynamic>))
-                .where((dog) => dog.owner != loggedInOwner)
-                .toList());
-      } catch (error) {
-        print('Error getting dogs: $error');
-        rethrow;
-      }
-    }
-    
-    String loggedInOwner = FirebaseAuth.instance.currentUser!.uid;
-    String loggedInDogUid = '';
-
-
-    void setLoggedInOwner() {
-      try {
-        loggedInOwner = FirebaseAuth.instance.currentUser!.uid;
-      } catch (e) {
-        // Handle the case where there is no logged-in user
-        print('error in getting uid: $e');
-        loggedInOwner = ''; // Set to an appropriate default value
-      }
-    }
-
-    Future<void> setLoggedInDog() async {
+  @override
+  Stream<List<Dog>> getDogs() {
     try {
-      DocumentSnapshot userSnapshot =
-          await FirebaseFirestore.instance.collection('users').doc(loggedInOwner).get();
+      // Query the "dogs" collection
+      setLoggedInOwner();
+      setLoggedInDog();
+
+      return _firebaseFirestore.collection('dogs').snapshots().map((snap) =>
+          snap.docs
+              .map((doc) => Dog.fromJson(doc.data() as Map<String, dynamic>))
+              .where((dog) => dog.owner != loggedInOwner)
+              .toList());
+    } catch (error) {
+      print('Error getting dogs: $error');
+      rethrow;
+    }
+  }
+
+  String loggedInOwner = FirebaseAuth.instance.currentUser!.uid;
+  String loggedInDogUid = '';
+
+  void setLoggedInOwner() {
+    try {
+      loggedInOwner = FirebaseAuth.instance.currentUser!.uid;
+    } catch (e) {
+      // Handle the case where there is no logged-in user
+      print('error in getting uid: $e');
+      loggedInOwner = ''; // Set to an appropriate default value
+    }
+  }
+
+  Future<void> setLoggedInDog() async {
+    try {
+      DocumentSnapshot userSnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(loggedInOwner)
+          .get();
 
       // Use the Users.fromJson method to create an instance of Users from the JSON data
       Users user = Users.fromJson(userSnapshot.data() as Map<String, dynamic>);
-     
+
       loggedInDogUid = user.activeDogId;
 
       // Get the dog using the updated getDog method and print its name
       await getDog(loggedInDogUid).first.then((dog) {
         print('Logged in dog name: ${dog.name}');
-        
+
         // Update the location of the dog in the 'dogs' collection
         updateDogLocation(loggedInDogUid);
       });
@@ -81,11 +79,10 @@ import 'package:pawfectmatch/services/locator.dart';
   }
 
   Future<void> updateLikedDogsInFirestore(String likedDogId) async {
-    try {      
+    try {
       String loggedInDog = loggedInDogUid;
       print('Liked Dog Id: $likedDogId');
       await FirebaseService().updateLikedDogs(loggedInDog, [likedDogId]);
-      
     } catch (e) {
       print('Error updating liked dogs in Firestore: $e');
     }
@@ -94,22 +91,25 @@ import 'package:pawfectmatch/services/locator.dart';
   Future<void> updateBlockedOwnersInFirestore(String blockedOwnerId) async {
     try {
       String loggedInUserId = loggedInOwner;
-      
+
       print('Blocked Dogs Owner: $blockedOwnerId');
-      await FirebaseService().updateBlockedOwners(loggedInUserId, [blockedOwnerId]);
-      
+      await FirebaseService()
+          .updateBlockedOwners(loggedInUserId, [blockedOwnerId]);
     } catch (e) {
       print('Error updating blocked owners in Firestore: $e');
     }
   }
-    
-  Future<bool> isDogLiked(String dogId, String likedDogId) async { 
+
+  Future<bool> isDogLiked(String dogId, String likedDogId) async {
     try {
       String likedDog = likedDogId;
 
       if (likedDog.isNotEmpty) {
         CollectionReference<Map<String, dynamic>> likedDogsCollection =
-            _firebaseFirestore.collection('dogs').doc(likedDog).collection('likedDogs');
+            _firebaseFirestore
+                .collection('dogs')
+                .doc(likedDog)
+                .collection('likedDogs');
 
         print('Checking if $dogId is liked by $likedDog');
 
@@ -130,7 +130,8 @@ import 'package:pawfectmatch/services/locator.dart';
     }
   }
 
-  Future<String> getOwnedDogID(String ownerId) async { //TO BE CHECKED
+  Future<String> getOwnedDogID(String ownerId) async {
+    //TO BE CHECKED
     try {
       // Get a reference to the 'user' document
       DocumentSnapshot<Map<String, dynamic>> userSnapshot =
@@ -142,7 +143,7 @@ import 'package:pawfectmatch/services/locator.dart';
         String dogOwned = userSnapshot.data()?['dog'];
         print('got the dog owned: $dogOwned');
 
-        return dogOwned;      
+        return dogOwned;
       } else {
         print('User document not found for ownerId: $ownerId');
         return '';
@@ -153,13 +154,16 @@ import 'package:pawfectmatch/services/locator.dart';
     }
   }
 
-  Future<List<String>> getLikedDogs() async { 
+  Future<List<String>> getLikedDogs() async {
     try {
       // Get a reference to the 'likedDogs' subcollection for the logged-in dog
       CollectionReference<Map<String, dynamic>> likedDogsCollection =
-          _firebaseFirestore.collection('dogs').doc(loggedInDogUid).collection('likedDogs');
+          _firebaseFirestore
+              .collection('dogs')
+              .doc(loggedInDogUid)
+              .collection('likedDogs');
 
-       print("got the reference");
+      print("got the reference");
 
       // Get all documents in the 'likedDogs' subcollection
       QuerySnapshot<Map<String, dynamic>> likedDogsSnapshot =
@@ -188,15 +192,19 @@ import 'package:pawfectmatch/services/locator.dart';
       // CollectionReference<Map<String, dynamic>> blockedOwnersCollection =
       //     FirebaseService().dogsCollection.doc(loggedInUserId).collection('blockedUsers');
 
-       CollectionReference<Map<String, dynamic>> blockedOwnersCollection =
-          _firebaseFirestore.collection('users').doc(loggedInOwner).collection('blockedUsers');
+      CollectionReference<Map<String, dynamic>> blockedOwnersCollection =
+          _firebaseFirestore
+              .collection('users')
+              .doc(loggedInOwner)
+              .collection('blockedUsers');
 
       // Get the documents in the 'blockedUsers' subcollection
       QuerySnapshot<Map<String, dynamic>> blockedOwnersSnapshot =
           await blockedOwnersCollection.get();
 
       // Extract the owner IDs of the blocked users
-      List<String> blockedOwners = blockedOwnersSnapshot.docs.map((doc) => doc.id).toList();
+      List<String> blockedOwners =
+          blockedOwnersSnapshot.docs.map((doc) => doc.id).toList();
 
       return blockedOwners;
     } catch (e) {
@@ -204,8 +212,6 @@ import 'package:pawfectmatch/services/locator.dart';
       return [];
     }
   }
-
-
 
   Future<List<Match>> getMatches() async {
     try {
@@ -216,7 +222,8 @@ import 'package:pawfectmatch/services/locator.dart';
       // Convert the QuerySnapshot to a List<Match>
       List<Match> matches = [];
 
-      for (QueryDocumentSnapshot<Map<String, dynamic>> doc in matchesSnapshot.docs) {
+      for (QueryDocumentSnapshot<Map<String, dynamic>> doc
+          in matchesSnapshot.docs) {
         Match match = Match.fromJson(doc.data() as Map<String, dynamic>);
 
         // Fetch the dog's name using the getDog method
@@ -238,34 +245,35 @@ import 'package:pawfectmatch/services/locator.dart';
   Future<void> createAppointment(Match match) async {
     try {
       // Create a new document in the 'matches' collection
-      await _firebaseFirestore.collection('matches').doc(match.id).set(match.toJson());
+      await _firebaseFirestore
+          .collection('matches')
+          .doc(match.id)
+          .set(match.toJson());
     } catch (error) {
       print('Error creating appointment: $error');
     }
   }
 
-Future<List<Appointment>> getAppointmentsByStatus(String status) async {
-  try {
-    // Query the 'appointments' collection based on the provided status
-    QuerySnapshot<Map<String, dynamic>> snapshot = await _firebaseFirestore
-        .collection('appointments')
-        .where('status', isEqualTo: status)
-        .where('user', isEqualTo: loggedInOwner)
-        .get();
+  Future<List<Appointment>> getAppointmentsByStatus(String status) async {
+    try {
+      // Query the 'appointments' collection based on the provided status
+      QuerySnapshot<Map<String, dynamic>> snapshot = await _firebaseFirestore
+          .collection('appointments')
+          .where('status', isEqualTo: status)
+          .where('user', isEqualTo: loggedInOwner)
+          .get();
 
-    // Extract appointments from the documents
-    List<Appointment> appointments = snapshot.docs.map((doc) {
-      return Appointment.fromJson(doc.data() as Map<String, dynamic>);
-    }).toList();
+      // Extract appointments from the documents
+      List<Appointment> appointments = snapshot.docs.map((doc) {
+        return Appointment.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
 
-    return appointments;
-  } catch (error) {
-    print('Error getting appointments by status: $error');
-    throw error; // Rethrow the error for handling in the calling code
+      return appointments;
+    } catch (error) {
+      print('Error getting appointments by status: $error');
+      throw error; // Rethrow the error for handling in the calling code
+    }
   }
-}
-
-
 
   Future<bool> checkMatch(String likedDogId) async {
     try {
@@ -284,50 +292,46 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
     }
   }
 
- Future<String> getDogOwned(String ownerId) async {
-  try {
-    // Get a reference to the 'user' document
-    DocumentSnapshot<Map<String, dynamic>> userSnapshot =
-        await _firebaseFirestore.collection('users').doc(ownerId).get();
+  Future<String> getDogOwned(String ownerId) async {
+    try {
+      // Get a reference to the 'user' document
+      DocumentSnapshot<Map<String, dynamic>> userSnapshot =
+          await _firebaseFirestore.collection('users').doc(ownerId).get();
 
-    // Check if the document exists
-    if (userSnapshot.exists) {
-      // Retrieve the 'dog' field from the document
-      String dogOwned = userSnapshot.data()?['dog'];
-      print('got the dog owned: $dogOwned');
+      // Check if the document exists
+      if (userSnapshot.exists) {
+        // Retrieve the 'dog' field from the document
+        String dogOwned = userSnapshot.data()?['dog'];
+        print('got the dog owned: $dogOwned');
 
-      // Use await to get the dog asynchronously
-      Dog? dog = await getDog(dogOwned).first;
-      
-      // Check if the dog is not null before returning its name
-      if (dog != null) {
-        return dog.name;
+        // Use await to get the dog asynchronously
+        Dog? dog = await getDog(dogOwned).first;
+
+        // Check if the dog is not null before returning its name
+        if (dog != null) {
+          return dog.name;
+        } else {
+          // Handle the case where the dog is not found
+          print('Dog not found for ownerId: $ownerId');
+          return '';
+        }
       } else {
-        // Handle the case where the dog is not found
-        print('Dog not found for ownerId: $ownerId');
+        print('User document not found for ownerId: $ownerId');
         return '';
       }
-    } else {
-      print('User document not found for ownerId: $ownerId');
+    } catch (error) {
+      print('Error getting dogOwned: $error');
       return '';
     }
-  } catch (error) {
-    print('Error getting dogOwned: $error');
-    return '';
   }
-}
 
-
-
-  Future<void> updateMatchInfo(String dogOwnerId, String matchedDogOwnerId) async {
+  Future<void> updateMatchInfo(
+      String dogOwnerId, String matchedDogOwnerId) async {
     try {
       // Perform the necessary actions to update match information in Firestore
       // For example, you can update a 'matches' collection or fields in the 'dogs' collection
       // Update the 'matches' field in Firestore for the specified dog
-      await _firebaseFirestore
-          .collection('dogs')
-          .doc(dogOwnerId)
-          .update({
+      await _firebaseFirestore.collection('dogs').doc(dogOwnerId).update({
         'matches': FieldValue.arrayUnion([matchedDogOwnerId]),
       });
     } catch (error) {
@@ -373,11 +377,12 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
 
   Future<bool> checkMatchExists(String user1, String user2) async {
     try {
-      QuerySnapshot<Map<String, dynamic>> querySnapshot = await _firebaseFirestore
-          .collection('matches')
-          .where('user1', isEqualTo: user1)
-          .where('user2', isEqualTo: user2)
-          .get();
+      QuerySnapshot<Map<String, dynamic>> querySnapshot =
+          await _firebaseFirestore
+              .collection('matches')
+              .where('user1', isEqualTo: user1)
+              .where('user2', isEqualTo: user2)
+              .get();
 
       return querySnapshot.docs.isNotEmpty;
     } catch (error) {
@@ -408,7 +413,8 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
             FirebaseFirestore.instance.collection('conversations').doc();
 
         // Create a messages subcollection inside the conversation
-        CollectionReference messagesRef = conversationRef.collection('messages');
+        CollectionReference messagesRef =
+            conversationRef.collection('messages');
 
         // Add an initial message
         DocumentReference initialMessageRef = await messagesRef.add({
@@ -425,7 +431,8 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
         await conversationRef.set({
           'user1': user1Id,
           'user2': user2Id,
-          'lastMessage': '', //see how this works, whether it suddenly sends like a blank chat bubble or what
+          'lastMessage':
+              '', //see how this works, whether it suddenly sends like a blank chat bubble or what
           // Add any other details you want to store about the conversation
         });
 
@@ -453,106 +460,107 @@ Future<List<Appointment>> getAppointmentsByStatus(String status) async {
       print('Error updating dog location: $e');
     }
   }
-   
 
   Future<GeoPoint?> getLoggedInDogLocation() async {
-  try {
-    // Check if loggedInDogUid is not empty or null
-    if (loggedInDogUid.isNotEmpty) {
-      // Retrieve the logged-in dog's document
-      DocumentSnapshot<Map<String, dynamic>> dogSnapshot =
-          await _firebaseFirestore.collection('dogs').doc(loggedInDogUid).get();
+    try {
+      // Check if loggedInDogUid is not empty or null
+      if (loggedInDogUid.isNotEmpty) {
+        // Retrieve the logged-in dog's document
+        DocumentSnapshot<Map<String, dynamic>> dogSnapshot =
+            await _firebaseFirestore
+                .collection('dogs')
+                .doc(loggedInDogUid)
+                .get();
 
-      // Check if the document exists
-      if (dogSnapshot.exists) {
-        // Retrieve the 'location' field from the document
-        GeoPoint? location = dogSnapshot.data()?['location'];
-        print('Got Logged In Dogs Location');
-        return location;
+        // Check if the document exists
+        if (dogSnapshot.exists) {
+          // Retrieve the 'location' field from the document
+          GeoPoint? location = dogSnapshot.data()?['location'];
+          print('Got Logged In Dogs Location');
+          return location;
+        } else {
+          print('Dog document not found for ID: $loggedInDogUid');
+          return null;
+        }
       } else {
-        print('Dog document not found for ID: $loggedInDogUid');
+        print('loggedInDogUid is empty or null');
         return null;
       }
-    } else {
-      print('loggedInDogUid is empty or null');
+    } catch (error) {
+      print('Error getting logged-in dog location: $error');
       return null;
     }
-  } catch (error) {
-    print('Error getting logged-in dog location: $error');
-    return null;
   }
-}
-
 
   Future<GeoPoint?> getDogLocation(String ownerUid) async {
-  try {
-    // Query the 'dogs' collection based on ownerUid
-    QuerySnapshot<Map<String, dynamic>> dogsSnapshot =
-        await _firebaseFirestore
-            .collection('dogs')
-            .where('owner', isEqualTo: ownerUid)
-            .get();
+    try {
+      // Query the 'dogs' collection based on ownerUid
+      QuerySnapshot<Map<String, dynamic>> dogsSnapshot =
+          await _firebaseFirestore
+              .collection('dogs')
+              .where('owner', isEqualTo: ownerUid)
+              .get();
 
-    // Check if any documents were found
-    if (dogsSnapshot.docs.isNotEmpty) {
-      // Retrieve the first document and its 'location' field
-      GeoPoint? location = dogsSnapshot.docs.first.data()['location'];
-      return location;
-    } else {
-      print('No dog found for owner ID: $ownerUid');
+      // Check if any documents were found
+      if (dogsSnapshot.docs.isNotEmpty) {
+        // Retrieve the first document and its 'location' field
+        GeoPoint? location = dogsSnapshot.docs.first.data()['location'];
+        return location;
+      } else {
+        print('No dog found for owner ID: $ownerUid');
+        return null;
+      }
+    } catch (error) {
+      print('Error getting dog location: $error');
       return null;
     }
-  } catch (error) {
-    print('Error getting dog location: $error');
-    return null;
+  }
+
+  Future<void> CancelAppointment(String appointmentId) async {
+    try {
+      // Get the reference to the specific appointment document
+      DocumentReference<Map<String, dynamic>> appointmentRef =
+          _firebaseFirestore.collection('appointments').doc(appointmentId);
+
+      // Update the status field
+      await appointmentRef.update({
+        'status': 'cancelled',
+      });
+    } catch (error) {
+      print('Error updating appointment status: $error');
+      throw error; // Rethrow the error for handling in the calling code
+    }
+  }
+
+  Future<void> confirmAppointment(String appointmentId) async {
+    try {
+      // Get the reference to the specific appointment document
+      DocumentReference<Map<String, dynamic>> appointmentRef =
+          _firebaseFirestore.collection('appointments').doc(appointmentId);
+
+      // Update the status field
+      await appointmentRef.update({
+        'status': 'upcoming',
+      });
+    } catch (error) {
+      print('Error updating appointment status: $error');
+      throw error; // Rethrow the error for handling in the calling code
+    }
+  }
+
+  Future<void> PaidAppointment(String appointmentId) async {
+    try {
+      // Get the reference to the specific appointment document
+      DocumentReference<Map<String, dynamic>> appointmentRef =
+          _firebaseFirestore.collection('appointments').doc(appointmentId);
+
+      // Update the status field
+      await appointmentRef.update({
+        'status': 'completed',
+      });
+    } catch (error) {
+      print('Error updating appointment status: $error');
+      throw error; // Rethrow the error for handling in the calling code
+    }
   }
 }
-
-Future<void> CancelAppointment(String appointmentId) async {
-  try {
-    // Get the reference to the specific appointment document
-    DocumentReference<Map<String, dynamic>> appointmentRef =
-        _firebaseFirestore.collection('appointments').doc(appointmentId);
-
-    // Update the status field
-    await appointmentRef.update({
-      'status': 'cancelled',
-    });
-  } catch (error) {
-    print('Error updating appointment status: $error');
-    throw error; // Rethrow the error for handling in the calling code
-  }
-}
-
-Future<void> confirmAppointment(String appointmentId) async {
-  try {
-    // Get the reference to the specific appointment document
-    DocumentReference<Map<String, dynamic>> appointmentRef =
-        _firebaseFirestore.collection('appointments').doc(appointmentId);
-
-    // Update the status field
-    await appointmentRef.update({
-      'status': 'upcoming',
-    });
-  } catch (error) {
-    print('Error updating appointment status: $error');
-    throw error; // Rethrow the error for handling in the calling code
-  }
-}
-Future<void> PaidAppointment(String appointmentId) async {
-  try {
-    // Get the reference to the specific appointment document
-    DocumentReference<Map<String, dynamic>> appointmentRef =
-        _firebaseFirestore.collection('appointments').doc(appointmentId);
-
-    // Update the status field
-    await appointmentRef.update({
-      'status': 'completed',
-    });
-  } catch (error) {
-    print('Error updating appointment status: $error');
-    throw error; // Rethrow the error for handling in the calling code
-  }
-}
- 
- }
