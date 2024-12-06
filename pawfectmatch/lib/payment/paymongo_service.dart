@@ -16,7 +16,6 @@ class PaymentService {
     final body = {
       "data": {
         "attributes": {
-          "cancel_url": "",
           "send_email_receipt": false,
           "show_description": true,
           "show_line_items": true,
