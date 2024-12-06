@@ -13,7 +13,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pawfectmatch/screens/screens.dart';
 
-
 class UserProfileScreen extends StatefulWidget {
   const UserProfileScreen({super.key});
 
@@ -125,21 +124,20 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
     try {
       // Assuming you have a list of dog ids (ownedDogs)
       for (String dogId in ownedDogs) {
-        // if (dogId!=doguid) 
+        // if (dogId!=doguid)
         DocumentSnapshot dogSnapshot = await FirebaseFirestore.instance
             .collection('dogs')
             .doc(dogId)
             .get();
-        
-          // Assuming dog data has the fields `name` and `profilePictureUrl`
-          Map<String, String> dogData = {
-            "dogId":dogSnapshot["dogId"],
-            "name": dogSnapshot["name"],
-            "profilePictureUrl": dogSnapshot["profilepicture"] ?? ''
-          };
 
-          dogProfiles.add(dogData);
-        
+        // Assuming dog data has the fields `name` and `profilePictureUrl`
+        Map<String, String> dogData = {
+          "dogId": dogSnapshot["dogId"],
+          "name": dogSnapshot["name"],
+          "profilePictureUrl": dogSnapshot["profilepicture"] ?? ''
+        };
+
+        dogProfiles.add(dogData);
       }
       setState(() {}); // Update UI after fetching dog profiles
     } catch (e) {
@@ -158,25 +156,28 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
           actions: [
             TextButton(
               onPressed: () async {
-                Navigator.pop(context); // Close dialog  
-                
+                Navigator.pop(context); // Close dialog
+
                 if (context.mounted) {
                   context.read<ActiveDogCubit>().setActiveDog(dogId!);
                 }
 
                 await FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(uid)
-                  .update({
-                    'activeDogId': dogId // Add dog ID to the array
-                  });                
+                    .collection('users')
+                    .doc(uid)
+                    .update({
+                  'activeDogId': dogId // Add dog ID to the array
+                });
 
                 doguid = dogId!;
 
-                fetchActiveDogData(); 
+                fetchActiveDogData();
                 if (context.mounted) {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => const HomeScreen()));      } 
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const HomeScreen()));
+                }
               },
               child: Text('Yes'),
             ),
@@ -719,7 +720,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                 dogname.isNotEmpty ? dogname : 'Dog',
                 style:
                     const TextStyle(fontWeight: FontWeight.w500, fontSize: 18),
-              ),              
+              ),
               const SizedBox(
                 height: 25,
               ),
@@ -740,10 +741,12 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                     ...List.generate(dogProfiles.length, (index) {
                       final dogProfile = dogProfiles[index];
                       return GestureDetector(
-                        onTap: () => _switchProfile(dogProfile["dogId"], dogProfile["name"]!),
+                        onTap: () => _switchProfile(
+                            dogProfile["dogId"], dogProfile["name"]!),
                         child: CircleAvatar(
                           radius: 45,
-                          backgroundImage: NetworkImage(dogProfile["profilePictureUrl"]!),
+                          backgroundImage:
+                              NetworkImage(dogProfile["profilePictureUrl"]!),
                         ),
                       );
                     }),
@@ -753,7 +756,8 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
                         onTap: _addNewProfile,
                         child: CircleAvatar(
                           radius: 45,
-                          backgroundColor: const Color.fromARGB(255, 186, 210, 246),
+                          backgroundColor:
+                              const Color.fromARGB(255, 186, 210, 246),
                           child: const Icon(
                             Icons.add,
                             color: Colors.white,
@@ -769,6 +773,9 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               ),
               signOutButton(context, () {
                 signUserOut(context);
+              }),
+              boostButton(context, () {
+                createProfileBoostCheckout(context);
               })
             ],
           ),

@@ -12,3 +12,4 @@ export 'review_screen.dart';
 export 'appointment_screen.dart';
 export 'map_screen.dart';
 export 'promptbot_screen.dart';
+export 'dogregistration_screen.dart';
