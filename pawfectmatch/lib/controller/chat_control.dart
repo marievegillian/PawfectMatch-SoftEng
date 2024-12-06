@@ -4,40 +4,90 @@ import 'package:intl/intl.dart';
 import 'package:pawfectmatch/models/models.dart';
 
 
+// Widget messageInput(
+//     TextEditingController ctrl, String convoID, String uid, String otherid) {
+//   return SizedBox(
+//       height: 50,
+//       child: TextField(
+//         controller: ctrl,
+//         enableSuggestions: true,
+//         autocorrect: true,
+//         cursorColor: const Color.fromARGB(255, 2, 0, 38),
+//         style: TextStyle(color: const Color(0xff011F3F).withOpacity(0.9)),
+//         maxLines:3,
+//         minLines:1,
+//         decoration: InputDecoration(
+//           labelText: 'Enter message...',
+//           suffixIcon: GestureDetector(
+//             onTap: () {
+//               // Call a function to send the message
+//               sendMessage(ctrl.text, convoID, uid, otherid);
+//               // Clear the text field after sending the message
+//               ctrl.clear();
+//             },
+//             child: const Icon(
+//               Icons.send_rounded,
+//               color: Color(0xff011F3F),
+//             ),
+//           ),
+//           filled: true,
+//           fillColor: Colors.white.withOpacity(0.3),
+//           border: OutlineInputBorder(
+//             borderRadius: BorderRadius.circular(2),
+//             borderSide: const BorderSide(width: 0, style: BorderStyle.solid),
+//           ),
+//         ),
+//         keyboardType: TextInputType.multiline,
+//         textInputAction: TextInputAction.newline,
+//       ));
+// }
+
 Widget messageInput(
     TextEditingController ctrl, String convoID, String uid, String otherid) {
-  return SizedBox(
-      height: 50,
-      child: TextField(
-        controller: ctrl,
-        enableSuggestions: true,
-        autocorrect: true,
-        cursorColor: Colors.white,
-        style: TextStyle(color: const Color(0xff011F3F).withOpacity(0.9)),
-        decoration: InputDecoration(
-          labelText: 'Enter message...',
-          suffixIcon: GestureDetector(
-            onTap: () {
-              // Call a function to send the message
-              sendMessage(ctrl.text, convoID, uid, otherid);
-              // Clear the text field after sending the message
-              ctrl.clear();
-            },
-            child: const Icon(
-              Icons.send_rounded,
-              color: Color(0xff011F3F),
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      return Container(
+        constraints: const BoxConstraints(
+          minHeight: 50.0, // Minimum height
+          maxHeight: 100.0, // Maximum height (for 3 lines)
+        ),
+        child: TextField(
+          controller: ctrl,
+          enableSuggestions: true,
+          autocorrect: true,
+          cursorColor: const Color.fromARGB(255, 2, 0, 38),
+          style: TextStyle(color: const Color(0xff011F3F).withOpacity(0.9)),
+          maxLines: null, // Dynamically calculate lines
+          minLines: 1, // Start with a single line
+          decoration: InputDecoration(
+            labelText: 'Enter message...',
+            suffixIcon: GestureDetector(
+              onTap: () {
+                // Send the message
+                sendMessage(ctrl.text, convoID, uid, otherid);
+                // Clear the text field
+                ctrl.clear();
+              },
+              child: const Icon(
+                Icons.send_rounded,
+                color: Color(0xff011F3F),
+              ),
+            ),
+            filled: true,
+            fillColor: Colors.white.withOpacity(0.3),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(2),
+              borderSide: const BorderSide(width: 0, style: BorderStyle.solid),
             ),
           ),
-          filled: true,
-          fillColor: Colors.white.withOpacity(0.3),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(2),
-            borderSide: const BorderSide(width: 0, style: BorderStyle.solid),
-          ),
+          keyboardType: TextInputType.multiline,
+          textInputAction: TextInputAction.newline,
         ),
-        keyboardType: TextInputType.multiline,
-      ));
+      );
+    },
+  );
 }
+
 
 Future<List<Map<String, dynamic>>> getMessages(String conversationId) async {
   try {
@@ -168,11 +218,20 @@ void sendMessage(
 Widget chatBubble(String message, bool isMyMessage) {
   return Container(
     padding: const EdgeInsets.all(12),
+    constraints: BoxConstraints(
+      maxWidth: 250, // Set a max width for the bubble
+    ),
     decoration: BoxDecoration(
       borderRadius: BorderRadius.circular(8),
       color: isMyMessage ? const Color(0xff006AFF) : Colors.grey,
     ),
-    child: Text(message, style: const TextStyle(color: Colors.white)),
+    // child: Text(message, style: const TextStyle(color: Colors.white)),
+    child: Text(
+      message,
+      style: const TextStyle(color: Colors.white),
+      softWrap: true, // Allow text to wrap
+      overflow: TextOverflow.visible, // Ensure overflow is visible
+    ),
   );
 }
 
