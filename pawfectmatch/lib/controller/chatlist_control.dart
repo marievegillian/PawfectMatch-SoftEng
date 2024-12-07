@@ -193,7 +193,11 @@ Widget buildConversationItem(Map<String, dynamic> conversation, String activeDog
                     "Start a conversation. Say hello!",
                     style: TextStyle(fontStyle: FontStyle.italic),
                   )
-                : Text(conversation['lastMessage'] ?? ''),
+                : Text(
+                    conversation['lastMessage'] ?? '',
+                    maxLines: 1, // Limit to one line
+                    overflow: TextOverflow.ellipsis, // Add ellipses at the end
+                  ),
             onTap: () {
               Navigator.push(
                 context,
