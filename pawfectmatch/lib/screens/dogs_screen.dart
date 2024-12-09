@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pawfectmatch/blocs/swipe/swipe_bloc.dart';
 import 'package:pawfectmatch/models/models.dart';
+import 'package:pawfectmatch/widgets/block_button.dart';
 import 'package:pawfectmatch/widgets/choice_button.dart';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -375,163 +376,9 @@ class DogsScreen extends StatelessWidget {
                           ],
                         ),
                       ),
-                    ),  
-                    
-                //medID field is removed, but commented for now
-                // Text('Medical Info', 
-                // style:TextStyle(
-                //       fontSize: 15.0,
-                //       fontFamily: 'Roboto',
-                //       fontWeight: FontWeight.bold, 
-                //       color: Colors.black
-                //       ),
-                //     ),                    
-                // Text('Med ID: ${dog.medID}', 
-                // style:TextStyle(
-                //       fontSize: 15.0,
-                //       fontFamily: 'Roboto',
-                //       fontWeight: FontWeight.normal, 
-                //       color: Colors.black
-                //       ),
-                //     ),
-
-                //Block button starts here
-                Center(
-                child: ConstrainedBox(
-                    constraints: const BoxConstraints(
-                        minWidth: 50.0,
-                  ),
-                child: Container(
-                  padding: const EdgeInsets.all(18.0),
-                  margin: const EdgeInsets.only(
-                    top: 25.0,
-                    right: 5.0,
-                  ),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(50.0),
-                    color: Colors.red,
-                  ),
-                  child: InkWell(
-                      onTap: () async {
-                        // Show confirmation dialog
-                        bool? confirm = await showDialog<bool>(
-                          context: context,
-                          barrierDismissible: false, // User must tap a button
-                          builder: (BuildContext context) {
-                            return AlertDialog(                            
-                              title: 
-                              const Center(
-                                child: Text(
-                                  'Confirm Block',
-                                   style: TextStyle(
-                                    fontSize: 25.0,
-                                    fontFamily: 'Roboto',
-                                    fontWeight: FontWeight.w700,                      
-                                    color: Color.fromARGB(255, 7, 34, 62),
-                                  ),
-                                ),
-                              ),
-                              content: const Text('Are you sure you want to block this user? You cannot undo this action.'),
-                              // ),
-                              actions: <Widget>[
-                                // Column to stack buttons vertically
-                                Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: <Widget>[
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0), // Rounded corners
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop(true); // User tapped 'Confirm'
-                                      },
-                                      child: const Center(
-                                        child: Text(
-                                          'Yes, block',
-                                            style: TextStyle(
-                                            fontSize: 18.0,
-                                            fontFamily: 'Roboto',
-                                            fontWeight: FontWeight.bold,                      
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(height: 5.0), // Space between buttons
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.white, // Background color
-                                        // onPrimary: Colors.white, // Text color
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8.0), // Rounded corners
-                                        ),
-                                      ),
-                                      onPressed: () {
-                                        Navigator.of(context).pop(false); // User tapped 'Cancel'
-                                      },
-                                      child: const Center(
-                                        child: Text(
-                                          'Nevermind, go back',
-                                          style: TextStyle(
-                                          fontSize: 18.0,
-                                          fontFamily: 'Roboto',
-                                          fontWeight: FontWeight.bold,                      
-                                          color: Colors.blue,
-                                        ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
-                          },
-                        );
-                  
-                        // if (confirm == true) {
-                        //   // Perform the block action
-                        //   String currentUserId = DatabaseRepository().loggedInOwner;
-                        //   String ownerIdToBlock = dog.owner;
-
-                        //   await DatabaseRepository().blockProfile(currentUserId, ownerIdToBlock);
-
-                        //   // Show confirmation message
-                        //   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        //     content: Text('Profile blocked successfully'),
-                        //   ));
-
-                        //   // Optionally, navigate back or perform additional actions
-                        //   Navigator.pop(context);
-                        // }
-                      
-                        // if (confirm == true) {
-                        //     context.read<SwipeBloc>().add(BlockOwner(dogs: state.dogs[0], context: context));
-                        //     Navigator.pop(context);
-                        // }
-
-                         if (confirm == true) {                          
-                            context.read<SwipeBloc>().add(BlockOwner(dogs: dog, context: context));
-                            Navigator.pop(context);  // Optionally, you can navigate back after blocking
-                          }
-                    },
-                    child: Center(
-                      child: Text(
-                        'Block this profile',
-                        style: TextStyle(
-                          fontSize: 16.0,
-                          fontFamily: 'Roboto',
-                          fontWeight: FontWeight.bold,                      
-                          color: Colors.white,
-                        ),                  
-                      ),
-                    ),               
-                    ),                  
-                  ),
-                ),
-                ),
+                    ),             
+                BlockButton(dog: dog),
+                
               ]
               ),
             )
