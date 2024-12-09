@@ -431,8 +431,7 @@ class DatabaseRepository extends BaseDatabaseRepository {
         await conversationRef.set({
           'user1': user1Id,
           'user2': user2Id,
-          'lastMessage':
-              '', //see how this works, whether it suddenly sends like a blank chat bubble or what
+          'lastMessage':'', //see how this works, whether it suddenly sends like a blank chat bubble or what
           // Add any other details you want to store about the conversation
         });
 
