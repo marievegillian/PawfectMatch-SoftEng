@@ -50,7 +50,18 @@ class _InterestSelectionScreenState extends State<InterestSelectionScreen> {
       if (selectedInterests.contains(interest)) {
         selectedInterests.remove(interest); // Deselect if already selected
       } else {
-        selectedInterests.add(interest); // Add to selected if not already
+        // selectedInterests.add(interest); // Add to selected if not already
+        // Add interest only if fewer than 5 are selected
+        if (selectedInterests.length < 5) {
+          selectedInterests.add(interest);
+        } else {
+          // Optionally, show a message when the limit is reached
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('You can select up to 5 activities only.'),
+            ),
+          );
+        }
       }
     });
   }
@@ -146,7 +157,7 @@ class _InterestSelectionScreenState extends State<InterestSelectionScreen> {
 
                 // Interest selection (GridView inside a fixed height container)
                 Text(
-                  'What activities do your dog enjoy?',
+                  'What activities do your dog enjoy? (Select a maximum of 5)',
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
