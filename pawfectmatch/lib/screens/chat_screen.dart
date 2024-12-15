@@ -2,9 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:pawfectmatch/controller/chat_control.dart';
+
+import '../models/models.dart';
 // import 'package:pawfectmatch/screens/appointment_screen.dart';
 
 class ChatScreen extends StatefulWidget {
+  final String myDogId;
   final String myDogName;
   final String otherDogName;
   final String otherDogPhotoUrl;
@@ -14,6 +17,7 @@ class ChatScreen extends StatefulWidget {
 
   const ChatScreen(
       {super.key,
+      required this.myDogId,
       required this.myDogName,
       required this.otherDogName,
       required this.otherDogPhotoUrl,
@@ -36,7 +40,7 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    uid = FirebaseAuth.instance.currentUser!.uid;    
+    uid = FirebaseAuth.instance.currentUser!.uid;   
     _scrollController = ScrollController();
   }
 
@@ -109,7 +113,8 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemBuilder: (context, index) {
                     return buildMessageItem(
                       messages[index],
-                      uid,
+                      // uid,
+                      widget.myDogId,
                       widget.otherDogName,
                       widget.otherDogPhotoUrl,
                       widget.myDogName,
@@ -120,7 +125,7 @@ class _ChatScreenState extends State<ChatScreen> {
               },
             ),
           ),
-          messageInput(_msgTxtCtrl, widget.convoID, uid, widget.otherUser),
+          messageInput(_msgTxtCtrl, widget.convoID, widget.myDogId, widget.otherUser), 
         ],
       ),
     );

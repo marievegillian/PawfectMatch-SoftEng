@@ -203,6 +203,7 @@ Widget buildConversationItem(Map<String, dynamic> conversation, String activeDog
                 context,
                 MaterialPageRoute(
                   builder: (context) => ChatScreen(
+                    myDogId: activeDogId,
                     myDogName: myDogData['name'] ?? '',
                     otherDogName: otherDogData['name'] ?? '',
                     otherDogPhotoUrl: otherDogData['photo'] ?? '',
