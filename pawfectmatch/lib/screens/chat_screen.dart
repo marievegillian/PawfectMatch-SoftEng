@@ -113,7 +113,6 @@ class _ChatScreenState extends State<ChatScreen> {
                   itemBuilder: (context, index) {
                     return buildMessageItem(
                       messages[index],
-                      // uid,
                       widget.myDogId,
                       widget.otherDogName,
                       widget.otherDogPhotoUrl,
