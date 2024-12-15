@@ -16,6 +16,8 @@ class PaymentService {
     final body = {
       "data": {
         "attributes": {
+          // "success_url": "yourapp://success/profile",
+          "success_url": "https://marievegillian.github.io/Redirect/",
           "send_email_receipt": false,
           "show_description": true,
           "show_line_items": true,
