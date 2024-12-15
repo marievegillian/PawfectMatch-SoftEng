@@ -18,7 +18,7 @@ class PaymentService {
         "attributes": {
           // "success_url": "yourapp://success/profile",
           "success_url": "https://marievegillian.github.io/Redirect/",
-          "send_email_receipt": false,
+          "send_email_receipt": true,
           "show_description": true,
           "show_line_items": true,
           "payment_method_types": paymentMethods,
