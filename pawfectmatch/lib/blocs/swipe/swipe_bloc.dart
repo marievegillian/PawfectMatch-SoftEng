@@ -69,9 +69,7 @@ void _onLoadDogs(
     final GeoPoint? userLocation = await _databaseRepository.getDogLocation(DatabaseRepository().loggedInOwner); // Fetch user's actual location
 
     if (userLocation == null) {
-      print('Error: User location is not available');
-      emit(SwipeError());
-      return;
+      print('Warning: User location is not available. Skipping distance filtering.');
     }
 
     // Fetch all dog locations asynchronously
@@ -113,7 +111,7 @@ void _onLoadDogs(
       // Distance filter
       if (maxDistance != null) {
         final GeoPoint? dogLocation = dogLocations[dog.owner];
-        if (dogLocation != null) {
+        if (dogLocation != null && userLocation != null) {
           double distance = calculateDistance(
             userLocation.latitude,
             userLocation.longitude,
