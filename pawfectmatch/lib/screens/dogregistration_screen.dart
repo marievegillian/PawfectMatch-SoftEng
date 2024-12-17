@@ -21,7 +21,6 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
   final TextEditingController _nameTxtCtrl = TextEditingController();
   final TextEditingController _bioTxtCtrl = TextEditingController();
   final TextEditingController _breedTxtCtrl = TextEditingController();
-  // final TextEditingController _medTxtCtrl = TextEditingController();
 
   Gender? selectedGender;
   List<String> _dogBreeds = [];
@@ -269,11 +268,6 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
                   ],
                 ),
 
-                // const Text("Breed",
-                //     textAlign: TextAlign.left,
-                //     style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-                // reusableInputTextField("Enter your dog's breed", _breedTxtCtrl,
-                //     TextInputType.text),
                 const Text("Breed"),
                 Autocomplete<String>(
                   optionsBuilder: (TextEditingValue textEditingValue) {
@@ -348,15 +342,7 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
                       ),
                     )),
 
-                const SizedBox(height: 20),
-                //medID field is removed, but commented for now
-                // const Text("Medical ID",
-                //     textAlign: TextAlign.left,
-                //     style: TextStyle(fontSize: 18, color: Color(0xff011F3F))),
-                // reusableInputTextField("Enter your dog's Medical ID",
-                //     _medTxtCtrl, TextInputType.text),
-
-                const SizedBox(height: 20),
+                const SizedBox(height: 40),
             
                 const Text("Vaccination Status",
                   textAlign: TextAlign.left,
@@ -431,7 +417,8 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
                 ),
 
                 loginRegisterButton(context, false, () {                  
-                  tempSaveDogData();
+                  // tempSaveDogData();
+                   _onNextButtonPressed();
                 })
               ],
             ),
@@ -440,6 +427,64 @@ class _DogRegistrationScreenState extends State<DogRegistrationScreen> {
       ),
     );
   }
+
+bool _validateFields({bool showDialogs = true}) {
+  // Check if any required fields are empty
+  if (_nameTxtCtrl.text.isEmpty ||
+      _bioTxtCtrl.text.isEmpty ||
+      selectedGender == null ||
+      _breedTxtCtrl.text.isEmpty ||
+      selectedVaxStatus == null) {
+    if (showDialogs) {
+      _showAlertDialog(
+        "Incomplete Information",
+        "Please ensure all fields are filled out before proceeding.",
+      );
+    }
+    return false; // Validation failed
+  }
+
+  // Check if vaccinated but no vaccines are selected
+  if (selectedVaxStatus == Vaccinated.isVaccinated &&
+      selectedVaccines.isEmpty) {
+    if (showDialogs) {
+      _showAlertDialog(
+        "No Vaccine Selected",
+        "Please select at least 1 vaccine before proceeding.",
+      );
+    }
+    return false; // Validation failed
+  }
+
+  return true; // All fields are valid
+}
+
+void _onNextButtonPressed() {
+  if (_validateFields()) {
+    tempSaveDogData();  
+  }
+}
+
+void _showAlertDialog(String title, String message) {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            child: const Text("OK"),
+            onPressed: () {
+              Navigator.of(context).pop(); // Close the dialog
+            },
+          ),
+        ],
+      );
+    },
+  );
+}
+
 
 void tempSaveDogData(){
   bool isMale = true;
@@ -466,7 +511,6 @@ void tempSaveDogData(){
     isMale: isMale,
     isVaccinated: isVax,
     vaccines: selectedVaccines,
-    // medID: medID, //medID field is removed, but commented for now
     purpose: purpose,
     activities: activities,
     name: _nameTxtCtrl.text,
