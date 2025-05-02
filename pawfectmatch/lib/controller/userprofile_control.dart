@@ -5,6 +5,43 @@ import 'package:pawfectmatch/payment/paymongo_service.dart';
 import 'package:pawfectmatch/utils/filter_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+Future<int> getDogProfileCount(String userId) async {
+  try {
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(userId)
+        .collection('ownedDogs')
+        .get();
+
+    return querySnapshot.docs.length;
+  } catch (e) {
+    print('Error fetching dog profiles count: $e');
+    return 0; // Return 0 on failure to avoid errors
+  }
+}
+
+Future<int> getArrayLength(String userId) async {
+  try {
+    // Reference to your Firestore document
+    DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+        .collection('users') // Collection name
+        .doc(userId) // Document ID
+        .get();
+
+    // Check if the document exists and the field is present
+    if (documentSnapshot.exists && documentSnapshot.data() != null) {
+      List<dynamic> itemsArray = documentSnapshot.get('ownedDogs');
+      return itemsArray.length; // Return the length of the array
+    } else {
+      return 0; // Return 0 if document or field doesn't exist
+    }
+  } catch (e) {
+    print('Error fetching array length: $e');
+    return 0; // Return 0 on error
+  }
+}
 
 void signUserOut(BuildContext context) {
   FirebaseAuth.instance.signOut();
@@ -32,6 +69,35 @@ void clearFilters() {
   };
 }
 
+void createAdditionalDogCheckout(BuildContext context) async {
+  final paymentService = PaymentService();
+
+  try {
+    final response = await paymentService.createCheckoutSession(
+      description: 'Add additional dog profile',
+      successUrl: 'https://marievegillian.github.io/Redirect/',
+      lineItems: [
+        {
+          "currency": "PHP",
+          "amount": 10000, // Amount in cents (PHP 100.00)
+          "name": "Additional Dog Profile",
+          "quantity": 1,
+          "description": "Add a third or more dog profile",
+        },
+      ],
+    );
+
+    print('Checkout Session Created: ${response['data']}');
+
+    // Redirect user to the checkout URL
+    final checkoutUrl = response['data']['attributes']['checkout_url'];
+    if (checkoutUrl != null) {
+      _launchCheckoutPage(checkoutUrl);
+    }
+  } catch (e) {
+    print('Error creating checkout session: $e');
+  }
+}
 
 void createProfileBoostCheckout(BuildContext context) async {
   final paymentService = PaymentService();
@@ -39,6 +105,7 @@ void createProfileBoostCheckout(BuildContext context) async {
   try {
     final response = await paymentService.createCheckoutSession(
       description: 'Boost profile for 3 days',
+      successUrl: 'https://marievegillian.github.io/Redirect/',
       lineItems: [
         {
           "currency": "PHP",
@@ -61,7 +128,38 @@ void createProfileBoostCheckout(BuildContext context) async {
   }
 }
 
-void _launchCheckoutPage(String checkoutUrl) async {
+Future<void> handleAddDogPayment(BuildContext context) async {
+  final paymentService = PaymentService();
+
+  try {
+    final response = await paymentService.createCheckoutSession(
+      description: 'Add Additional Dog Profile',
+      successUrl: 'https://marievegillian.github.io/Redirect/',
+      lineItems: [
+        {
+          "currency": "PHP",
+          "amount": 10000, // PHP 100.00 (in cents)
+          "name": "Additional Dog Profile",
+          "quantity": 1,
+          "description": "Add a 3rd dog profile",
+        },
+      ],
+    );
+
+    // Redirect user to PayMongo checkout URL
+    final checkoutUrl = response['data']['attributes']['checkout_url'];
+    if (checkoutUrl != null) {
+      await _launchCheckoutPage(checkoutUrl);
+    }
+  } catch (e) {
+    print('Error processing payment: $e');
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Failed to process payment.')),
+    );
+  }
+}
+
+Future<void> _launchCheckoutPage(String checkoutUrl) async {
   final Uri url = Uri.parse(checkoutUrl);
   if (await canLaunchUrl(url)) {
     await launchUrl(
@@ -72,6 +170,18 @@ void _launchCheckoutPage(String checkoutUrl) async {
     throw 'Could not launch $checkoutUrl';
   }
 }
+
+// void _launchCheckoutPage(String checkoutUrl) async {
+//   final Uri url = Uri.parse(checkoutUrl);
+//   if (await canLaunchUrl(url)) {
+//     await launchUrl(
+//       url,
+//       mode: LaunchMode.externalApplication,
+//     );
+//   } else {
+//     throw 'Could not launch $checkoutUrl';
+//   }
+// }
 
 Container signOutButton(BuildContext context, Function onTap) {
   return Container(
@@ -137,7 +247,7 @@ Container boostButton(BuildContext context, Function onTap) {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              "Boost Profile",
+              "Boost",
               style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.w400,
