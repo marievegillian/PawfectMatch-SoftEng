@@ -91,6 +91,7 @@ class _InterestSelectionScreenState extends State<InterestSelectionScreen> {
       fullProfile.bio,
       fullProfile.isMale,
       fullProfile.breed,
+      fullProfile.size,
       fullProfile.birthday,
       fullProfile.purpose,
       fullProfile.activities,
