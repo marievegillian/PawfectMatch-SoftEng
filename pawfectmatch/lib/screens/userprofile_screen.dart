@@ -192,7 +192,7 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       },
     );
   }
-
+/*
   void _addNewProfile() {
     if (dogProfiles.length < maxProfiles) {
       showDialog(
@@ -232,6 +232,78 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
       );
     }
   }
+*/
+  void _addNewProfile() async {
+  final userId = FirebaseAuth.instance.currentUser?.uid;
+  if (userId == null) return;
+
+  // Fetch the count of dog profiles
+  // int dogCount = await getDogProfileCount(userId);
+  int dogCount = await getArrayLength(userId);
+
+  if (dogCount > 2) {
+    // Allow user to add a free profile
+        
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add New Dog Profile?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DogRegistrationScreen(),
+                  ),
+                );
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  } else {
+    // Trigger payment checkout for the third (or more) dog profile
+    // createAdditionalDogCheckout(context);
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Add New Dog Profile?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                createAdditionalDogCheckout(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DogRegistrationScreen(),
+                  ),
+                );
+              },
+              child: const Text('Yes'),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: const Text('No'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
 
   Future<void> showEditProfileDialog() async {
     final TextEditingController _pwTxtCtrl = TextEditingController();
@@ -774,9 +846,6 @@ class _UserProfileScreenState extends State<UserProfileScreen> {
               signOutButton(context, () {
                 signUserOut(context);
               }),
-              boostButton(context, () {
-                createProfileBoostCheckout(context);
-              })
             ],
           ),
         ),

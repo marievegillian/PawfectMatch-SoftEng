@@ -509,6 +509,7 @@ void tempSaveDogData(){
     birthday: formattedDate,
     breed: _breedTxtCtrl.text,
     isMale: isMale,
+    size: 'medium',
     isVaccinated: isVax,
     vaccines: selectedVaccines,
     purpose: purpose,

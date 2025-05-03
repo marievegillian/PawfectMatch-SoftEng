@@ -9,6 +9,7 @@ class PaymentService {
   Future<Map<String, dynamic>> createCheckoutSession({
     required String description,
     required List<Map<String, dynamic>> lineItems,
+    required String successUrl,
     List<String> paymentMethods = const ['gcash', 'paymaya', 'card'],
   }) async {
     final url = Uri.parse(_baseUrl);
@@ -17,7 +18,8 @@ class PaymentService {
       "data": {
         "attributes": {
           // "success_url": "yourapp://success/profile",
-          "success_url": "https://marievegillian.github.io/Redirect/",
+          // "success_url": "https://marievegillian.github.io/Redirect/",
+          "success_url": successUrl,
           "send_email_receipt": true,
           "show_description": true,
           "show_line_items": true,
