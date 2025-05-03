@@ -19,10 +19,13 @@ class InterestSelectionScreen extends StatefulWidget {
 class _InterestSelectionScreenState extends State<InterestSelectionScreen> {
   // List of interests
   final List<String> interests = [
-    'Hiking', 'Walks', 'Playing Catch', 'Swimming',
-    'Gobbling on treats', 'Performing tricks',
-    'Tug of War', 'Agility Courses', 'Chasing',
-    'Digging', 'Cuddling', 'Fetching', 'Scent Tracking', 'Running'
+    // 'Hiking', 'Walks', 'Playing Catch', 'Swimming',
+    // 'Gobbling on treats', 'Performing tricks',
+    // 'Tug of War', 'Agility Courses', 'Chasing',
+    // 'Digging', 'Cuddling', 'Fetching', 'Scent Tracking', 'Running'
+    'Cuddling', 'Nap Time', 'Grooming', 'Getting Pets', 'Cafe/Mall Trips',
+    'Outdoor Walks', 'Playing', 'Performing Tricks','Tug of War', 'Fetch',
+    'Running', 'Swimming', 'Hiking', 'Agility Courses', 'Frisbee'
   ];
 
   final DogRegistrationControl _dogRegistrationControl =
